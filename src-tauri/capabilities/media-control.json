@@ -1,0 +1,14 @@
+{
+  "$schema": "../gen/schemas/desktop-schema.json",
+  "identifier": "media-control",
+  "description": "Capability for media devices access",
+  "windows": ["main"],
+  "permissions": [
+    "core:default",
+    "core:window:default",
+    "core:event:default",
+    "core:webview:allow-clear-all-browsing-data",
+    "core:webview:allow-create-webview",
+    "core:webview:allow-set-webview-focus"
+  ]
+}
