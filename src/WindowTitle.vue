@@ -28,7 +28,7 @@ const isTauriApp = ref(false);
 const appWindow = ref<any>(null);
 const isMaximized = ref(false);
 
-const titleText = 'TunA';
+const titleText = '-=[TunA]=-';
 const animatedText = computed(() => titleText.split(''));
 
 const minimizeWindow = () => appWindow.value?.minimize();

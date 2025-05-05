@@ -1,16 +1,80 @@
-# Tauri + Vue + TypeScript
+# 🎵 Tuner - Tauri + Vue + TypeScript
 
-This template should help get you started developing with Vue 3 and TypeScript in Vite. The template uses Vue 3 `<script setup>` SFCs, check out the [script setup docs](https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup) to learn more.
+Tuner — это приложение для настройки музыкальных инструментов, созданное с использованием **Tauri**, **Vue 3**, **TypeScript** и **Vite**. Оно поддерживает кроссплатформенные сборки и предлагает современный интерфейс с использованием TailwindCSS.
 
-## Recommended IDE Setup
+---
 
-- [VS Code](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) + [Tauri](https://marketplace.visualstudio.com/items?itemName=tauri-apps.tauri-vscode) + [rust-analyzer](https://marketplace.visualstudio.com/items?itemName=rust-lang.rust-analyzer)
+## 🚀 Особенности
 
-## Type Support For `.vue` Imports in TS
+- **Кроссплатформенность**: Работает на Windows, macOS и Linux.
+- **Современный стек**: Vue 3, TypeScript, Pinia, TailwindCSS.
+- **Поддержка PWA**: Приложение можно установить как прогрессивное веб-приложение.
+- **Интеграция с Tauri**: Использование Rust для нативных возможностей.
+- **Выбор устройства**: Поддержка выбора микрофона.
+- **Темы**: Светлая, тёмная и системная темы.
 
-Since TypeScript cannot handle type information for `.vue` imports, they are shimmed to be a generic Vue component type by default. In most cases this is fine if you don't really care about component prop types outside of templates. However, if you wish to get actual prop types in `.vue` imports (for example to get props validation when using manual `h(...)` calls), you can enable Volar's Take Over mode by following these steps:
+---
 
-1. Run `Extensions: Show Built-in Extensions` from VS Code's command palette, look for `TypeScript and JavaScript Language Features`, then right click and select `Disable (Workspace)`. By default, Take Over mode will enable itself if the default TypeScript extension is disabled.
-2. Reload the VS Code window by running `Developer: Reload Window` from the command palette.
+## 🛠️ Установка и запуск
 
-You can learn more about Take Over mode [here](https://github.com/johnsoncodehk/volar/discussions/471).
+### 1. Установите зависимости
+Убедитесь, что у вас установлены следующие инструменты:
+- [Node.js](https://nodejs.org/) (рекомендуется версия LTS)
+- [Rust](https://www.rust-lang.org/tools/install)
+- [Tauri CLI](https://tauri.app/v1/guides/getting-started/prerequisites/)
+
+### 2. Клонируйте репозиторий
+```bash
+git clone https://github.com/username/tuner.git
+cd tuner
+```
+
+### 3. Установите зависимости
+```bash
+npm install
+```
+
+### 4. Запустите приложение в режиме разработки
+```bash
+npm run dev
+```
+
+### 5. Сборка приложения
+Для сборки приложения выполните:
+```bash
+npm run build
+npm run tauri build
+```
+
+---
+
+## 📂 Структура проекта
+
+```
+tuner/
+├── src/                     # Исходный код приложения
+│   ├── components/          # Компоненты Vue
+│   ├── composables/         # Логика Vue Composition API
+│   ├── constants/           # Константы приложения
+│   ├── data/                # Статичные данные
+│   ├── pages/               # Страницы приложения
+│   ├── router/              # Маршруты Vue Router
+│   ├── stores/              # Состояние приложения (Pinia)
+│   ├── utils/               # Утилиты
+│   └── workers/             # Веб-воркеры
+├── src-tauri/               # Конфигурация и код Tauri
+├── public/                  # Статические файлы
+├── index.html               # Точка входа
+├── package.json             # Скрипты и зависимости
+└── README.md                # Документация
+```
+
+---
+
+## 🛡️ Лицензия
+
+Этот проект распространяется под лицензией **MIT**. Подробнее см. [LICENSE](LICENSE).
+
+---
+
+

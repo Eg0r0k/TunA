@@ -6,7 +6,7 @@
                        text-muted-foreground hover:text-foreground
                        transition-colors duration-150 [&.router-link-active]:text-foreground [&.router-link-active]:font-medium">
                 <HomeIcon width="16" class="mb-0.5" />
-                <span class="text-xs">Home</span>
+                <span class="text-xs">H0me</span>
             </RouterLink>
 
             <RouterLink draggable="false" to="/settings"
@@ -14,7 +14,7 @@
                    text-muted-foreground hover:text-foreground
                    transition-colors duration-150 [&.router-link-active]:text-foreground [&.router-link-active]:font-medium">
                 <Settings width="16" class="mb-0.5" />
-                <span class="text-xs">Settings</span>
+                <span class="text-xs">Sett1ngs</span>
             </RouterLink>
         </nav>
     </header>

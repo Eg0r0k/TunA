@@ -1,6 +1,6 @@
 import { computed, onUnmounted, ref, watch } from "vue";
 import { useAudio } from "./useAudio";
-import { GUITAR_TUNINGS, type Tuning } from "@/data/tunings";
+import { INSTRUMENTS, type Tuning } from "@/data/tunings";
 import { NoteWithOctave, TUNER_CONFIG } from "@/constants/tuner";
 import { getNoteName, getNoteFrequency } from "@/utils/noteUtils";
 
@@ -17,7 +17,7 @@ export const useFrequencyAnalyzer = () => {
   const clarity = ref(0);
 
   const suggestedNote = ref<NoteWithOctave | null>(null);
-  const currentTuning = ref<Tuning>(GUITAR_TUNINGS[0]);
+  const currentTuning = ref<Tuning>(INSTRUMENTS[0].tunings[0]); // Используем первый тюнинг первого инструмента по умолчанию
   const tunedStrings = ref<Map<NoteWithOctave, TunedString>>(new Map());
   const selectedString = ref<NoteWithOctave | null>(null);
 
@@ -27,9 +27,6 @@ export const useFrequencyAnalyzer = () => {
     currentTuning.value = tuning;
     selectedString.value = null;
   };
-
-
-  
 
   const resetTuning = () => {
     tunedStrings.value.clear();

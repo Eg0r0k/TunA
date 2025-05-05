@@ -1,38 +1,51 @@
 <template>
-    <div class="flex flex-col items-center h-full  gap-4">
+    <div class="flex flex-col items-center h-full gap-4">
         <Dialog>
-            <DialogTrigger>
-                Edit Profile
+            <DialogTrigger
+                class="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2">
+                {{ currentInstrument.name }} - {{ currentTuning.name }}
             </DialogTrigger>
-            <DialogContent>
+            <DialogContent class="sm:max-w-[425px]">
                 <DialogHeader>
-                    <DialogTitle>Edit profile</DialogTitle>
+                    <DialogTitle>Выберите инструмент и настройку</DialogTitle>
                     <DialogDescription>
-                        Make changes to your profile here. Click save when you're done.
-                    </DialogDescription>
+                        Выберите свой инструмент и предпочтительную настройку. </DialogDescription>
                 </DialogHeader>
 
-                <DialogFooter>
-                    Save changes
-                </DialogFooter>
+                <div class="grid gap-4 py-4">
+                    <div class="grid gap-2">
+                        <Label>Инструмент</Label>
+                        <Select :model-value="currentInstrument"
+                            @update:model-value="(value) => handleInstrumentChange(value as Instrument)">
+                            <SelectTrigger>
+                                <SelectValue placeholder="Select instrument" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem v-for="instrument in INSTRUMENTS" :key="instrument.id" :value="instrument">
+                                    {{ instrument.name }}
+                                </SelectItem>
+                            </SelectContent>
+                        </Select>
+                    </div>
+
+                    <div class="grid gap-2">
+                        <Label>Настройка</Label>
+                        <Select :model-value="currentTuning"
+                            @update:model-value="(value) => handleTuningChange(value as Tuning)">
+                            <SelectTrigger>
+                                <SelectValue placeholder="Select tuning" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem v-for="tuning in currentInstrument.tunings" :key="tuning.id"
+                                    :value="tuning">
+                                    {{ tuning.name }}
+                                </SelectItem>
+                            </SelectContent>
+                        </Select>
+                    </div>
+                </div>
             </DialogContent>
         </Dialog>
-        <Select :model-value="currentTuning"
-            @update:model-value="(value) => handleTuningChange(value as Tuning | null)">
-            <SelectTrigger class="w-[240px]">
-                <SelectValue placeholder="Select a tuning">
-                    {{ currentTuning.name }}
-                </SelectValue>
-            </SelectTrigger>
-            <SelectContent>
-                <SelectGroup>
-                    <SelectLabel>Guitar Tunings</SelectLabel>
-                    <SelectItem v-for="tuning in GUITAR_TUNINGS" :key="tuning.id" :value="tuning">
-                        {{ tuning.name }}
-                    </SelectItem>
-                </SelectGroup>
-            </SelectContent>
-        </Select>
         <div class="note-visualizer bg-card rounded-lg border-2 p-4 w-full max-w-[300px] ">
             <div class="flex flex-col items-center">
                 <div class="tuner-gauge relative w-52 h-36 mb-4">
@@ -62,7 +75,7 @@
                 </div>
 
                 <div class="flex flex-col items-center gap-2 text-muted-foreground">
-                    <span class="text-sm">{{ formatFrequency }} Hz</span>
+                    <span class="text-sm">[ {{ formatFrequency }} ] Hz</span>
                     <span class="text-sm font-medium" :class="accuracyTextColor">
                         {{ accuracyText }}
                         <template v-if="selectedString">
@@ -80,7 +93,7 @@
         </div>
 
         <div class="standard-tuning" v-if="isActive">
-            <div class="flex gap-4">
+            <div class="flex justify-center flex-wrap gap-4">
                 <button v-for="({ note, isCurrent, isTuned, isSelected }, index) in memoizedTuningState" :key="index"
                     class="tuning-note px-4 py-2 rounded-lg transition-colors duration-200" :class="{
                         'bg-secondary text-secondary-foreground': isCurrent,
@@ -97,14 +110,13 @@
 
 <script setup lang="ts">
 import { useFrequencyAnalyzer } from '@/composables/useFrequencyAnalyzer';
-import { computed } from 'vue';
+import { ref, computed } from 'vue';
 import { Button } from '@/components/ui/button';
+import { Label } from '@/components/ui/label';
 import {
     Select,
     SelectContent,
-    SelectGroup,
     SelectItem,
-    SelectLabel,
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
@@ -113,13 +125,12 @@ import {
     Dialog,
     DialogContent,
     DialogDescription,
-    DialogFooter,
     DialogHeader,
     DialogTitle,
     DialogTrigger,
-} from '@/components/ui/dialog'
+} from '@/components/ui/dialog';
 
-import { GUITAR_TUNINGS, type Tuning } from '@/data/tunings';
+import { INSTRUMENTS, type Instrument, type Tuning } from '@/data/tunings';
 import { NoteWithOctave, TUNER_CONFIG } from '@/constants/tuner';
 import { getPrevNote, getNextNote, splitNote } from '@/utils/noteUtils';
 
@@ -137,6 +148,13 @@ const {
     setSelectedString,
     resetTuning,
 } = useFrequencyAnalyzer();
+
+const currentInstrument = ref<Instrument>(INSTRUMENTS[0]);
+
+const handleInstrumentChange = (instrument: Instrument) => {
+    currentInstrument.value = instrument;
+    handleTuningChange(instrument.tunings[0]);
+};
 
 const handleTuningChange = (tuning: Tuning | null): void => {
     if (tuning && tuning.id !== currentTuning.value.id) {
