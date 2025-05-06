@@ -135,7 +135,6 @@ onMounted(async () => {
     pointer-events: none;
 }
 
-/* Адаптивность для маленьких экранов */
 @media (max-width: 600px) {
     .titlebar-text {
         font-size: 12px;

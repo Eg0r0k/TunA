@@ -14,45 +14,52 @@ export default defineConfig(async () => ({
     VitePWA({
       registerType: "autoUpdate",
       includeAssets: ["favicon.ico", "robots.txt", "icons/*.png"],
+      // devOptions: {
+      //   enabled: false,
+      // },
+      injectRegister: "auto",
       manifest: {
         name: "TunA",
         short_name: "TunA",
-        theme_color: "#2d2d2d",
+        theme_color: "#090909",
         background_color: "#090909",
         display: "standalone",
         start_url: ".",
       },
       workbox: {
-        globPatterns: ["**/*.{js,css,html,ico,png,svg}"],
         cleanupOutdatedCaches: true,
         clientsClaim: true,
         skipWaiting: true,
       },
     }),
   ],
+  build: {
+    sourcemap: false,
+    terserOptions: {
+      compress: {
+        drop_console: false,
+        drop_debugger: false,
+      },
+    },
+    chunkSizeWarningLimit: 1600,
+  },
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
     },
   },
-  // Vite options tailored for Tauri development and only applied in `tauri dev` or `tauri build`
-  //
-  // 1. prevent vite from obscuring rust errors
   clearScreen: false,
-  // 2. tauri expects a fixed port, fail if that port is not available
   server: {
     port: 1420,
     strictPort: true,
-    host: "0.0.0.0", // Разрешаем доступ со всех интерфейсов
     hmr: host
       ? {
           protocol: "ws",
           host,
-          port: 1421,
+          port: 1420,
         }
       : undefined,
     watch: {
-      // 3. tell vite to ignore watching `src-tauri`
       ignored: ["**/src-tauri/**"],
     },
   },

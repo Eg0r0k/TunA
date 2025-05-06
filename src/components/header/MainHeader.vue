@@ -1,26 +1,30 @@
 <template>
     <header class="border-t">
         <nav class="flex items-center h-[50px] ">
-            <RouterLink draggable="false" to="/"
+            <RouterLink draggable="false" :to="link.path" v-for="link in LINKS" :key="link.name"
                 class="flex flex-col items-center justify-center flex-1 h-full
                        text-muted-foreground hover:text-foreground
                        transition-colors duration-150 [&.router-link-active]:text-foreground [&.router-link-active]:font-medium">
-                <HomeIcon width="16" class="mb-0.5" />
-                <span class="text-xs">H0me</span>
-            </RouterLink>
-
-            <RouterLink draggable="false" to="/settings"
-                class="flex flex-col items-center justify-center flex-1 h-full
-                   text-muted-foreground hover:text-foreground
-                   transition-colors duration-150 [&.router-link-active]:text-foreground [&.router-link-active]:font-medium">
-                <Settings width="16" class="mb-0.5" />
-                <span class="text-xs">Sett1ngs</span>
+                <component :is="link.icon" width="16" class="mb-0.5" />
+                <span class="text-xs">{{ link.name }}</span>
             </RouterLink>
         </nav>
     </header>
 </template>
 
 <script lang="ts" setup>
-import { HomeIcon, Settings } from 'lucide-vue-next';
+import { HomeIcon, type LucideIcon, Settings } from 'lucide-vue-next';
 import { RouterLink } from 'vue-router';
+
+interface Link {
+    name: string;
+    icon: LucideIcon;
+    path: string;
+}
+
+const LINKS: Link[] = [
+    { name: 'H0me', icon: HomeIcon, path: '/' },
+    { name: 'Sett1ngs', icon: Settings, path: '/settings' },
+]
+
 </script>

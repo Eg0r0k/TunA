@@ -17,7 +17,8 @@
         "width": 800,
         "minWidth": 400,
         "minHeight": 400,
-        "height": 600
+        "height": 600,
+        "devtools": true
       }
     ],
     "security": {
