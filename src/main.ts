@@ -10,7 +10,7 @@ const app = createApp(App);
 app.use(pinia);
 app.use(router);
 app.mount("#app");
-
+//TODO: Add later info about refresh and offline
 registerSW({
   onNeedRefresh() {
     alert("need to refresh");
