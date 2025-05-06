@@ -8,6 +8,8 @@ const host = process.env.TAURI_DEV_HOST;
 
 // https://vitejs.dev/config/
 export default defineConfig(async () => ({
+  base: process.env.NODE_ENV === "production" ? "/TunA/" : "/",
+
   plugins: [
     vue(),
     tailwindcss(),
@@ -19,12 +21,12 @@ export default defineConfig(async () => ({
       // },
       injectRegister: "auto",
       manifest: {
-        name: "TunA",
-        short_name: "TunA",
+        name: process.env.VITE_PWA_NAME,
+        short_name: process.env.VITE_PWA_NAME,
         theme_color: "#090909",
         background_color: "#090909",
+
         display: "standalone",
-        start_url: ".",
       },
       workbox: {
         cleanupOutdatedCaches: true,

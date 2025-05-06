@@ -1,7 +1,8 @@
 import { titleMiddleware } from "@/middleware/titleMiddleware";
+import PageNotFound from "@/PageNotFound.vue";
 import MainPage from "@/pages/MainPage.vue";
 import SettingsPage from "@/pages/SettingsPage.vue";
-import { createRouter, createWebHistory } from "vue-router";
+import { createRouter, createWebHashHistory } from "vue-router";
 
 const routes = [
   {
@@ -14,10 +15,16 @@ const routes = [
     component: SettingsPage,
     meta: { title: "Settings" },
   },
+  {
+    path: "/:pathMatch(.*)*",
+    component: PageNotFound,
+    meta: { title: "Not found" },
+  },
 ];
 
 const router = createRouter({
-  history: createWebHistory(),
+  history: createWebHashHistory(import.meta.env.BASE_URL),
+
   scrollBehavior(_to, _from, savedPosition) {
     if (savedPosition) {
       return savedPosition;
