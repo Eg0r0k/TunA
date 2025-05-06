@@ -1,5 +1,9 @@
 export type NoteName = (typeof NOTES)[number];
 export type NoteWithOctave = `${NoteName}${number}`;
+export type SupportedLocale = (typeof SUPPORTED_LOCALES)[number];
+
+export const DEFAULT_LOCALE = "en";
+export const SUPPORTED_LOCALES = ["ru", "en"] as const;
 
 export const NOTES = [
   "C",
@@ -22,8 +26,7 @@ export const TUNER_CONFIG = {
   MAX_FREQUENCY: 1200,
   MIN_CLARITY: 0.8,
   TUNING_THRESHOLD: 0.1,
-  TUNING_DELAY: 200,   //? MB add
+  TUNING_DELAY: 200, //? MB add
   GAUGE_MAX_ROTATION: 90,
   UPDATE_INTERVAL: 100,
 } as const;
-

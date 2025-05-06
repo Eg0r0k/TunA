@@ -22,11 +22,12 @@
     "lucide-vue-next": "^0.506.0",
     "pinia": "^3.0.2",
     "pitchy": "^4.1.0",
-    "reka-ui": "^2.2.0",
+    "reka-ui": "^2.2.1",
     "tailwind-merge": "^3.2.0",
     "tailwindcss": "^4.1.5",
     "tw-animate-css": "^1.2.8",
     "vue": "^3.5.13",
+    "vue-i18n": "^11.1.3",
     "vue-router": "^4.5.1"
   },
   "devDependencies": {

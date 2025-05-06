@@ -2,7 +2,7 @@ import { defineConfig } from "vite";
 import vue from "@vitejs/plugin-vue";
 import path from "node:path";
 import { VitePWA } from "vite-plugin-pwa";
-
+import pkg from "./package.json";
 import tailwindcss from "@tailwindcss/vite";
 const host = process.env.TAURI_DEV_HOST;
 
@@ -35,6 +35,9 @@ export default defineConfig(async () => ({
       },
     }),
   ],
+  define: {
+    __APP_VERSION__: JSON.stringify(pkg.version),
+  },
   build: {
     sourcemap: false,
     terserOptions: {

@@ -7,18 +7,19 @@
             </DialogTrigger>
             <DialogContent class="sm:max-w-[425px]">
                 <DialogHeader>
-                    <DialogTitle>Выберите инструмент и настройку</DialogTitle>
-                    <DialogDescription>
-                        Выберите свой инструмент и предпочтительную настройку. </DialogDescription>
+                    <DialogTitle>{{ $t('tuner.instrumentDialog.title') }}</DialogTitle>
+                    <DialogDescription>{{ $t('tuner.instrumentDialog.description') }}</DialogDescription>
+
                 </DialogHeader>
 
                 <div class="grid gap-4 py-4">
                     <div class="grid gap-2">
-                        <Label>Инструмент</Label>
+                        <Label>{{ $t('tuner.selectInstrument') }}</Label>
+
                         <Select :model-value="currentInstrument"
                             @update:model-value="(value) => handleInstrumentChange(value as Instrument)">
                             <SelectTrigger>
-                                <SelectValue placeholder="Select instrument" />
+                                <SelectValue :placeholder="$t('tuner.selectInstrument')" />
                             </SelectTrigger>
                             <SelectContent>
                                 <SelectItem v-for="instrument in INSTRUMENTS" :key="instrument.id" :value="instrument">
@@ -29,11 +30,11 @@
                     </div>
 
                     <div class="grid gap-2">
-                        <Label>Настройка</Label>
+                        <Label>{{ $t('tuner.selectTuning') }}</Label>
                         <Select :model-value="currentTuning"
                             @update:model-value="(value) => handleTuningChange(value as Tuning)">
                             <SelectTrigger>
-                                <SelectValue placeholder="Select tuning" />
+                                <SelectValue :placeholder="$t('tuner.selectTuning')" />
                             </SelectTrigger>
                             <SelectContent>
                                 <SelectItem v-for="tuning in currentInstrument.tunings" :key="tuning.id"
@@ -75,9 +76,9 @@
                 </div>
 
                 <div class="flex flex-col items-center gap-2 text-muted-foreground">
-                    <span class="text-sm">[ {{ formatFrequency }} ] Hz</span>
+                    <span class="text-sm"> {{ $t('tuner.frequency', { frequency: formatFrequency }) }}</span>
                     <span class="text-sm font-medium" :class="accuracyTextColor">
-                        {{ accuracyText }}
+                        {{ $t(`tuner.status.${accuracyStatus}`) }}
                         <template v-if="selectedString">
                             ({{ selectedString.slice(0, -1) }}{{ selectedString.slice(-1) }})
                         </template>
@@ -88,7 +89,8 @@
 
         <div class="flex items-center gap-4">
             <Button @click="isActive ? stop() : start()" :variant="isActive ? 'destructive' : 'default'">
-                {{ isActive ? 'Stop' : 'Start' }} Tuner
+                {{ isActive ? $t('tuner.stop') : $t('tuner.start') }}
+
             </Button>
         </div>
 
@@ -176,22 +178,17 @@ const accuracyTextColor = computed(() => {
     return 'text-destructive';
 });
 
-const accuracyText = computed(() => {
-    if (!frequency.value) return '—';
+const accuracyStatus = computed(() => {
+    if (!frequency.value) return 'default';
 
     if (selectedString.value) {
-        if (suggestedNote.value !== selectedString.value) {
-            return 'Wrong string';
-        }
-
-        if (Math.abs(accuracy.value) < TUNER_CONFIG.TUNING_THRESHOLD)
-            return 'In tune';
-        return accuracy.value > 0 ? 'Tune down' : 'Tune up';
+        if (suggestedNote.value !== selectedString.value) return 'wrongString';
+        if (Math.abs(accuracy.value) < TUNER_CONFIG.TUNING_THRESHOLD) return 'inTune';
+        return accuracy.value > 0 ? 'tuneDown' : 'tuneUp';
     }
 
-    if (Math.abs(accuracy.value) < TUNER_CONFIG.TUNING_THRESHOLD)
-        return 'In tune';
-    return accuracy.value > 0 ? 'Too high' : 'Too low';
+    if (Math.abs(accuracy.value) < TUNER_CONFIG.TUNING_THRESHOLD) return 'inTune';
+    return accuracy.value > 0 ? 'tooHigh' : 'tooLow';
 });
 
 const formatFrequency = computed(() =>
