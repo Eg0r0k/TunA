@@ -9,8 +9,8 @@
 ## 📸 Интерфейс приложения
 
 <div align="center">
-  <img src="https://eg0r0k.github.io/TunA/screenshots/main.webp" width="45%" alt="Главный экран TunA"/>
-  <img src="https://eg0r0k.github.io/TunA/screenshots/settings.webp" width="45%" alt="Настройки TunA"/>
+  <img src="https://raw.githubusercontent.com/Eg0r0k/TunA/refs/heads/main/public/screenshots/main.webp" width="45%" alt="Главный экран TunA"/>
+  <img src="https://raw.githubusercontent.com/Eg0r0k/TunA/refs/heads/main/public/screenshots/settings.webp" width="45%" alt="Настройки TunA"/>
   <br>
   <em>Главный экран и панель настроек приложения</em>
 </div>
