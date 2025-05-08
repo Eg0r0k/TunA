@@ -1,5 +1,5 @@
 <template>
-    <div class="flex flex-col items-center h-full gap-4">
+    <section class="flex flex-col items-center h-full gap-4">
         <Dialog>
             <DialogTrigger
                 class="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2">
@@ -77,10 +77,10 @@
 
                 <div class="flex flex-col items-center gap-2 text-muted-foreground">
                     <span class="text-sm"> {{ $t('tuner.frequency', { frequency: formatFrequency }) }}</span>
-                    <span class="text-sm font-medium" :class="accuracyTextColor">
+                    <span role="status" aria-live="polite" class="text-sm font-medium" :class="accuracyTextColor">
                         {{ $t(`tuner.status.${accuracyStatus}`) }}
                         <template v-if="selectedString">
-                            ({{ selectedString.slice(0, -1) }}{{ selectedString.slice(-1) }})
+                            ({{ splitNote(selectedString).name }}{{ splitNote(selectedString).octave }})
                         </template>
                     </span>
                 </div>
@@ -96,18 +96,20 @@
 
         <div class="standard-tuning" v-if="isActive">
             <div class="flex justify-center flex-wrap gap-4">
-                <button v-for="({ note, isCurrent, isTuned, isSelected }, index) in memoizedTuningState" :key="index"
-                    class="tuning-note px-4 py-2 rounded-lg transition-colors duration-200" :class="{
+                <button :aria-pressed="isSelected"
+                    v-for="({ note, displayName, isCurrent, isTuned, isSelected, displayOctave }, index) in memoizedTuningState"
+                    :key="index" class="tuning-note px-4 py-2 rounded-lg transition-colors duration-200" :class="{
                         'bg-secondary text-secondary-foreground': isCurrent,
                         'bg-primary text-primary-foreground': isTuned,
                         'ring-2 ring-accent': isSelected
-                    }" @click="toggleStringSelection(note)">
-                    {{ note.slice(0, -1) }}
-                    <span class="text-xs">{{ note.slice(-1) }}</span>
+                    }" @keydown.enter.space="toggleStringSelection(note)">
+                    {{ displayName }}
+
+                    <span class="text-xs">{{ displayOctave }}</span>
                 </button>
             </div>
         </div>
-    </div>
+    </section>
 </template>
 
 <script setup lang="ts">
@@ -178,6 +180,8 @@ const accuracyTextColor = computed(() => {
     return 'text-destructive';
 });
 
+// We return the status as strings for i18n
+// exemple: tuneUp -> tuner.status.tuneUp = status in the required language
 const accuracyStatus = computed(() => {
     if (!frequency.value) return 'default';
 
@@ -201,12 +205,17 @@ const gaugeRotation = computed(() => {
 });
 
 const memoizedTuningState = computed(() =>
-    currentTuning.value.notes.map(note => ({
-        note,
-        isCurrent: isCurrentNote(note),
-        isTuned: isNoteTuned(note),
-        isSelected: selectedString.value === note
-    }))
+    currentTuning.value.notes.map(note => {
+        const { name, octave } = splitNote(note);
+        return {
+            note,
+            displayName: name,
+            displayOctave: octave,
+            isCurrent: isCurrentNote(note),
+            isTuned: isNoteTuned(note),
+            isSelected: selectedString.value === note
+        };
+    })
 );
 
 const isCurrentNote = (targetNote: NoteWithOctave) => {

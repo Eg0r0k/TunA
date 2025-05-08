@@ -1,5 +1,5 @@
 <template>
-  <div class="p-6 max-w-5xl mx-auto space-y-8">
+  <section class="p-6 max-w-5xl mx-auto space-y-8">
     <div class="space-y-4">
       <div class="space-y-2">
         <h2 class="text-lg font-semibold">{{ $t('settings.audioSettings.title') }}</h2>
@@ -47,17 +47,17 @@
       </div>
       <DropdownMenu>
         <DropdownMenuTrigger as-child>
-          <Button variant="outline" class="justify-between w-full">
+          <Button variant="outline" class="justify-between  w-32">
             <div class="flex items-center gap-2">
               <Globe class="size-4" />
               <span>{{ $t(`locales.${currentLocale}`) }}</span>
             </div>
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="start" class="w-[200px]">
+        <DropdownMenuContent align="start">
           <DropdownMenuItem v-for="lang in supportedLocale" :key="lang" @click="currentLocale = lang" class="gap-2">
             <span>{{ $t(`locales.${lang}`) }}</span>
-            <Check v-if="currentLocale === lang" class="ml-auto size-4" />
+            <Check v-show="currentLocale === lang" class="ml-auto size-4" />
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
@@ -71,19 +71,19 @@
 
       <DropdownMenu>
         <DropdownMenuTrigger as-child>
-          <Button variant="outline" class="justify-between ">
+          <Button variant="outline" class="justify-between w-32 ">
             <div class="flex items-center gap-2">
               <component :is="themes.find(t => t.id === appStore.mode)?.icon" class="size-4" />
               <span>{{ $t(`settings.theme.${appStore.mode}`) }}</span>
             </div>
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="start" class="w-[200px]">
+        <DropdownMenuContent align="start">
           <DropdownMenuItem v-for="theme in themes" :key="theme.id"
             @click="appStore.mode = theme.id as BasicColorSchema" class="gap-2">
             <component :is="theme.icon" class="size-4" />
             <span>{{ $t(`settings.theme.${theme.id}`) }}</span>
-            <Check v-if="appStore.mode === theme.id" class="ml-auto size-4" />
+            <Check v-show="appStore.mode === theme.id" class="ml-auto size-4" />
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
@@ -130,9 +130,7 @@
         </DialogContent>
       </Dialog>
     </div>
-
-
-  </div>
+  </section>
 </template>
 
 <script lang="ts" setup>
@@ -163,9 +161,12 @@ import { Separator } from '@/components/ui/separator';
 import { isTauri } from '@tauri-apps/api/core';
 import { BasicColorSchema } from '@vueuse/core';
 import { useLanguage } from '@/composables/useLanguage';
+import { useI18n } from 'vue-i18n';
 
 const appStore = useAppStore();
-const appVersion = ref('Загрузка...');
+const { t } = useI18n()
+
+const appVersion = ref('');
 
 const { currentLocale, supportedLocale } = useLanguage()
 
@@ -176,6 +177,7 @@ const themes = [
   { id: 'dark', icon: Moon },
   { id: 'system', icon: Laptop }
 ]
+
 const selectedDeviceId = computed({
   get: () => appStore.state.selectedDeviceId || '',
   set: (value) => appStore.setDevice(value),
@@ -196,7 +198,7 @@ onBeforeMount(async () => {
     appVersion.value = __APP_VERSION__;
   } catch (error) {
     console.error('Ошибка при получении версии приложения:', error);
-    appVersion.value = isTauri() ? 'Неизвестно' : __APP_VERSION__;
+    appVersion.value = isTauri() ? t('general.unknown') : __APP_VERSION__;
   }
 });
 </script>

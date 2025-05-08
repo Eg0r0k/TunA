@@ -1,10 +1,19 @@
-import { NOTES, NoteWithOctave, NoteName } from "@/constants/tuner";
+import {
+  NOTES,
+  NoteWithOctave,
+  NoteName,
+  TUNER_CONFIG,
+} from "@/constants/tuner";
 import { useAppStore } from "@/stores/appStore";
 
-export function splitNote(note: NoteWithOctave | null | undefined): {
+interface SplitedNote {
   name: NoteName | "—";
   octave: string;
-} {
+}
+
+export const splitNote = (
+  note: NoteWithOctave | null | undefined
+): SplitedNote => {
   if (!note) {
     return { name: "—", octave: "" };
   }
@@ -17,7 +26,7 @@ export function splitNote(note: NoteWithOctave | null | undefined): {
     name: NOTES.includes(name as NoteName) ? (name as NoteName) : "—",
     octave,
   };
-}
+};
 
 export const getNoteFrequency = (note: NoteWithOctave) => {
   const { name: noteName, octave } = splitNote(note);
@@ -33,7 +42,12 @@ export const getNoteFrequency = (note: NoteWithOctave) => {
 };
 
 export const getNoteName = (frequency: number): NoteWithOctave | null => {
-  if (!frequency || frequency < 20 || frequency > 20000) return null;
+  if (
+    !frequency ||
+    frequency < TUNER_CONFIG.MIN_FREQUENCY ||
+    frequency > TUNER_CONFIG.MAX_FREQUENCY
+  )
+    return null;
   const appStore = useAppStore();
 
   const semitonesFromA4 =

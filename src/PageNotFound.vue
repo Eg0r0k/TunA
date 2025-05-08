@@ -1,5 +1,5 @@
 <template>
-    <div class="flex h-full flex-col items-center justify-center space-y-6">
+    <section class="flex h-full flex-col items-center justify-center space-y-6">
         <div class="space-y-3 text-center">
             <pre class="text-primary animate-pulse text-xl font-medium md:text-2xl">
 ╔═══════╗
@@ -9,15 +9,16 @@
 
             <h1 class="font-mono text-4xl font-bold tracking-tighter text-foreground/80">(◡﹏◡)</h1>
             <p class="font-mono text-sm text-muted-foreground">
-                [ОШИБКА 0x0000001A] Ресурс не обнаружен
+                {{ $t("notFound.error") }}
             </p>
         </div>
 
         <Button variant="secondary" asChild>
             <RouterLink to="/">
-                <-- ВОЗВРАТ К ИНДЕКСУ </RouterLink>
+                {{ $t("notFound.button") }}
+            </RouterLink>
         </Button>
-    </div>
+    </section>
 </template>
 
 <script lang="ts" setup>

@@ -1,5 +1,5 @@
 <template>
-    <div class="titlebar border-b" data-tauri-drag-region v-if="isTauriApp">
+    <nav role="toolbar" aria-label="Window controls" class="titlebar border-b" data-tauri-drag-region v-if="isTauriApp">
         <div class="titlebar-text">
             <span v-for="(char, index) in animatedText" :key="index" class="titlebar-char"
                 :style="{ animationDelay: `${index * 0.1}s` }">
@@ -7,17 +7,18 @@
             </span>
         </div>
         <div class="titlebar-controls">
-            <button class="titlebar-button" @click="minimizeWindow" title="Minimize">
+            <button class="titlebar-button" @click="minimizeWindow" :title="$t('window.minimize')">
                 —
             </button>
-            <button class="titlebar-button" @click="toggleMaximize" :title="isMaximized ? 'Restore' : 'Maximize'">
+            <button class="titlebar-button" @click="toggleMaximize"
+                :title="isMaximized ? $t('window.restore') : $t('window.maximize')">
                 ☐
             </button>
-            <button class="titlebar-button titlebar-close" @click="closeWindow" title="Close">
+            <button class="titlebar-button titlebar-close" @click="closeWindow" :title="$t('window.close')">
                 ✕
             </button>
         </div>
-    </div>
+    </nav>
 </template>
 
 <script setup lang="ts">

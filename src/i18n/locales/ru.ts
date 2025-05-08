@@ -37,7 +37,10 @@ export default {
     github: "GitHub",
     copyright: "© {year} TunA. Все права НЕ защищены. ⊂(◉‿◉)つ",
   },
-
+  notFound: {
+    error: " [ERROR 0x0000001A] Рессурс не найден",
+    button: "<-- ВОЗВРАТ К ИНДЕКСУ",
+  },
   tuner: {
     selectInstrument: "Выберите инструмент",
     selectTuning: "Выберите настройку",
@@ -58,8 +61,18 @@ export default {
       description: "Выберите инструмент и предпочтительную настройку",
     },
   },
-
+  window: {
+    minimize: "Свернуть",
+    maximize: "Развернуть",
+    restore: "Свернуть в окно",
+    close: "Закрыть",
+  },
+  navigation: {
+    home: "Главная",
+    settings: "Настройки",
+  },
   general: {
+    unknown: "Неизвестно",
     hertz: "Гц",
   },
 };

@@ -39,7 +39,10 @@ export default {
     web: "Web",
     copyright: "© {year} TunA. All rights NOT reserved. ⊂(◉‿◉)つ",
   },
-
+  notFound: {
+    error: " [ERROR 0x0000001A] Resource not found",
+    button: "<-- BACK TO INDEX",
+  },
   tuner: {
     selectInstrument: "Select instrument",
     selectTuning: "Select tuning",
@@ -60,8 +63,18 @@ export default {
       description: "Choose your instrument and preferred tuning",
     },
   },
-
+  navigation: {
+    home: "Home",
+    settings: "Settings",
+  },
+  window: {
+    minimize: "Minimize",
+    maximize: "Maximize",
+    restore: "Restore",
+    close: "Close",
+  },
   general: {
+    unknown: "Unknown",
     hertz: "Hz",
   },
 };

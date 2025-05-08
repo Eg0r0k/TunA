@@ -6,7 +6,7 @@
                        text-muted-foreground hover:text-foreground
                        transition-colors duration-150 [&.router-link-active]:text-foreground [&.router-link-active]:font-medium">
                 <component :is="link.icon" width="16" class="mb-0.5" />
-                <span class="text-xs">{{ link.name }}</span>
+                <span class="text-xs">{{ $t(`navigation.${link.name}`) }}</span>
             </RouterLink>
         </nav>
     </header>
@@ -15,16 +15,20 @@
 <script lang="ts" setup>
 import { HomeIcon, type LucideIcon, Settings } from 'lucide-vue-next';
 import { RouterLink } from 'vue-router';
-
 interface Link {
     name: string;
     icon: LucideIcon;
     path: string;
 }
+//TODO: Add handler for middle click 
+//# Have problembs with tauri, need to lern how prevent or handle new Webview windows from tauri 
+//? Mb add prevents on link clicks
 
 const LINKS: Link[] = [
-    { name: 'H0me', icon: HomeIcon, path: '/' },
-    { name: 'Sett1ngs', icon: Settings, path: '/settings' },
+    { name: 'home', icon: HomeIcon, path: '/' },
+    { name: 'settings', icon: Settings, path: '/settings' },
 ]
+
+
 
 </script>

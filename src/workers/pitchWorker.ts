@@ -11,7 +11,6 @@ self.onmessage = (
   if (!detector) {
     detector = PitchDetector.forFloat32Array(buffer.length);
   }
-
   const [pitch, clarity] = detector.findPitch(buffer, sampleRate);
 
   if (

@@ -17,7 +17,9 @@ export const useFrequencyAnalyzer = () => {
   const clarity = ref(0);
 
   const suggestedNote = ref<NoteWithOctave | null>(null);
-  const currentTuning = ref<Tuning>(INSTRUMENTS[0].tunings[0]); // Используем первый тюнинг первого инструмента по умолчанию
+
+  //Select first string
+  const currentTuning = ref<Tuning>(INSTRUMENTS[0].tunings[0]);
   const tunedStrings = ref<Map<NoteWithOctave, TunedString>>(new Map());
   const selectedString = ref<NoteWithOctave | null>(null);
 
