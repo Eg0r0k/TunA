@@ -8,22 +8,24 @@
 
       <div class="grid gap-4">
         <div class="flex items-center gap-4 truncate">
-          <Select v-model="selectedDeviceId" @update:model-value="(value) => handleDeviceChange(value as string)">
+          <Select v-model="selectedDeviceId" @update:model-value="(value) => handleDeviceChange(value as string)"
+            v-if="appStore.audioDevices.length > 0">
             <SelectTrigger class="w-full">
               <SelectValue :placeholder="$t('settings.audioSettings.selectMicrophone')" />
             </SelectTrigger>
             <SelectContent>
               <SelectGroup>
                 <SelectLabel>{{ $t('settings.audioSettings.availableDevices') }}</SelectLabel>
-
                 <SelectItem v-for="device in appStore.audioDevices" :key="device.deviceId" :value="device.deviceId">
-                  {{ device.label || $t('settings.audioSettings.microphoneLabel', { id: device.deviceId.slice(0, 4) })
+                  {{ device.label || $t('settings.audioSettings.microphoneLabel', { id: device.deviceId?.slice(0, 4) })
                   }}
-
                 </SelectItem>
               </SelectGroup>
             </SelectContent>
           </Select>
+          <div v-else class="text-sm text-muted-foreground">
+            ! {{ $t('settings.audioSettings.noDevices') }} !
+          </div>
         </div>
       </div>
     </div>
@@ -151,7 +153,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Slider } from '@/components/ui/slider';
-import { Moon, Sun, Laptop, Check, Info, Github, GitPullRequest, Globe } from 'lucide-vue-next';
+import { Moon, Sun, Laptop, Check, Info, Github, GitPullRequest, Globe, CircleAlert } from 'lucide-vue-next';
 import { useAppStore } from '@/stores/appStore';
 import { computed, onBeforeMount, ref } from 'vue';
 import { getVersion } from '@tauri-apps/api/app';
@@ -179,18 +181,37 @@ const themes = [
 ]
 
 const selectedDeviceId = computed({
-  get: () => appStore.state.selectedDeviceId || '',
-  set: (value) => appStore.setDevice(value),
+  get: () => appStore.state.selectedDeviceId || null,
+  set: (value) => appStore.setDevice(value || ''),
 });
 
-const handleDeviceChange = async (deviceId: string) => {
-  appStore.setDevice(deviceId);
+const handleDeviceChange = async (deviceId: string | null) => {
+  try {
+
+    if (!deviceId) return;
+    await appStore.setDevice(deviceId);
+  } catch (error) {
+    console.error('Device change failed:', error);
+  }
 };
 
 onBeforeMount(async () => {
-  if (appStore.audioDevices.length > 0 && !appStore.state.selectedDeviceId) {
-    appStore.setDevice(appStore.audioDevices[0].deviceId);
+  try {
+    await appStore.ensurePermissions();
+
+    if (appStore.audioDevices.length > 0) {
+      const defaultDevice = appStore.audioDevices.find(d =>
+        d.deviceId === appStore.state.selectedDeviceId
+      ) || appStore.audioDevices[0];
+
+      if (defaultDevice) {
+        await appStore.setDevice(defaultDevice.deviceId);
+      }
+    }
+  } catch (error) {
+    console.error('Device initialization error:', error);
   }
+
   try {
     if (isTauri()) {
       appVersion.value = await getVersion();

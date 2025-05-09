@@ -3,6 +3,13 @@ export default {
     en: "English",
     ru: "Russian",
   },
+  errors: {
+    microphoneNotFound: "Microphone not found",
+    microphonePermissionDenied: "Microphone access denied",
+    errotToaccessMicrophone: "Error accessing microphone",
+    unknownError: "Unknown error",
+    mediaApiError: "The MediaDevices API is not supported by your device.",
+  },
   settings: {
     audioSettings: {
       title: "Audio Settings",
@@ -10,6 +17,7 @@ export default {
       availableDevices: "Available Devices",
       microphoneLabel: "Microphone ({id})",
       selectMicrophone: "Select microphone",
+      noDevices: "Audio usage is disabled or audio devices are missing",
     },
     a4Calibration: {
       title: "A4 Calibration",

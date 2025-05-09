@@ -182,3 +182,7 @@ body {
   scrollbar-width: thin;
   scrollbar-color: var(--color-border) var(--color-background);
 }
+
+button {
+  cursor: pointer !important;
+}

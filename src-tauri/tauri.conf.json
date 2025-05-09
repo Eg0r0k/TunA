@@ -1,7 +1,7 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
   "productName": "tuner",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "identifier": "com.tuner.app",
   "build": {
     "beforeDevCommand": "npm run dev",

@@ -3,6 +3,13 @@ export default {
     en: "Английский",
     ru: "Русский",
   },
+  errors: {
+    microphoneNotFound: "Микрофон не найден",
+    microphonePermissionDenied: "Доступ к микрофону запрещён",
+    errotToaccessMicrophone: "Ошибка доступа к микрофону",
+    unknownError: "Неизвестная ошибка",
+    mediaApiError: "API MediaDevices не поддерживается вашим устройством",
+  },
   settings: {
     audioSettings: {
       title: "Настройки аудио",
@@ -10,6 +17,8 @@ export default {
       availableDevices: "Доступные устройства",
       microphoneLabel: "Микрофон ({id})",
       selectMicrophone: "Выбрать микрофон",
+      noDevices:
+        "Использование аудио отключено или аудио устройства отсутствуют",
     },
     a4Calibration: {
       title: "Калибровка A4",

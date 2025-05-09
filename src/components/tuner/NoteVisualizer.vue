@@ -102,7 +102,7 @@
                         'bg-secondary text-secondary-foreground': isCurrent,
                         'bg-primary text-primary-foreground': isTuned,
                         'ring-2 ring-accent': isSelected
-                    }" @keydown.enter.space="toggleStringSelection(note)">
+                    }" @click="toggleStringSelection(note)" @keydown.enter.space="toggleStringSelection(note)">
                     {{ displayName }}
 
                     <span class="text-xs">{{ displayOctave }}</span>
@@ -155,19 +155,6 @@ const {
 
 const currentInstrument = ref<Instrument>(INSTRUMENTS[0]);
 
-const handleInstrumentChange = (instrument: Instrument) => {
-    currentInstrument.value = instrument;
-    handleTuningChange(instrument.tunings[0]);
-};
-
-const handleTuningChange = (tuning: Tuning | null): void => {
-    if (tuning && tuning.id !== currentTuning.value.id) {
-        setTuning(tuning);
-        resetTuning();
-        setSelectedString(null);
-    }
-};
-
 const noteParts = computed(() => splitNote(suggestedNote.value));
 const currentNote = computed(() => noteParts.value.name);
 const prevNote = computed(() => getPrevNote(currentNote.value));
@@ -217,6 +204,19 @@ const memoizedTuningState = computed(() =>
         };
     })
 );
+
+const handleInstrumentChange = (instrument: Instrument) => {
+    currentInstrument.value = instrument;
+    handleTuningChange(instrument.tunings[0]);
+};
+
+const handleTuningChange = (tuning: Tuning | null): void => {
+    if (tuning && tuning.id !== currentTuning.value.id) {
+        setTuning(tuning);
+        resetTuning();
+        setSelectedString(null);
+    }
+};
 
 const isCurrentNote = (targetNote: NoteWithOctave) => {
     return suggestedNote.value === targetNote;

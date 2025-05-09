@@ -1,4 +1,4 @@
-import { computed, onUnmounted, ref, watch } from "vue";
+import { computed, onUnmounted, ref, shallowRef, watch } from "vue";
 import { useAudio } from "./useAudio";
 import { INSTRUMENTS, type Tuning } from "@/data/tunings";
 import { NoteWithOctave, TUNER_CONFIG } from "@/constants/tuner";
@@ -43,25 +43,27 @@ export const useFrequencyAnalyzer = () => {
     if (!currentTuning.value || !note) return false;
 
     if (selectedString.value && note !== selectedString.value) {
-      tunedStrings.value.clear();
+      resetTuning();
       return false;
     }
 
     const accuracyValue = Math.abs(accuracy.value);
 
-    const targetString = currentTuning.value.notes.find((n) => n === note) as
-      | NoteWithOctave
-      | undefined;
+    const targetString = currentTuning.value.notes.find((n) => n === note);
+
     if (!targetString) return false;
 
     if (accuracyValue < 0.1) {
-      const now = Date.now();
+      const now = performance.now();
       const stringState: TunedString = tunedStrings.value.get(targetString) || {
         note: targetString,
         timestamp: now,
         tuned: false,
       };
-      if (now - stringState.timestamp >= 200 && !stringState.tuned) {
+      if (
+        now - stringState.timestamp >= TUNER_CONFIG.TUNING_DELAY &&
+        !stringState.tuned
+      ) {
         stringState.tuned = true;
       }
 
@@ -87,30 +89,34 @@ export const useFrequencyAnalyzer = () => {
   let animationFrameId: number;
   let lastAnalysisTime = 0;
 
-  const worker = ref<Worker | null>(null);
+  const worker = shallowRef<Worker | null>(null);
 
   const initWorker = () => {
-    if (!worker.value) {
-      worker.value = new Worker(
-        new URL("../workers/pitchWorker.ts", import.meta.url),
-        { type: "module" }
-      );
+    if (worker.value) return;
 
-      worker.value.onmessage = (
-        e: MessageEvent<{ pitch: number; clarity: number }>
-      ) => {
-        const { pitch, clarity: clarityValue } = e.data;
-        frequency.value = pitch;
-        clarity.value = clarityValue;
-        const newNote = getNoteName(pitch);
-        if (newNote !== suggestedNote.value) {
-          suggestedNote.value = newNote;
-          if (newNote) {
-            checkTuning(newNote);
-          }
-        }
-      };
-    }
+    worker.value = new Worker(
+      new URL("../workers/pitchWorker.ts", import.meta.url),
+      { type: "module" }
+    );
+
+    worker.value.onmessage = (
+      e: MessageEvent<{ pitch: number; clarity: number }>
+    ) => {
+      const { pitch, clarity: clarityValue } = e.data;
+
+      frequency.value = pitch;
+      clarity.value = clarityValue;
+      const newNote = getNoteName(pitch);
+
+      if (newNote && newNote !== suggestedNote.value) {
+        suggestedNote.value = newNote;
+        checkTuning(newNote);
+      }
+    };
+    worker.value.onerror = (e) => {
+      console.error("Worker error:", e);
+      stop();
+    };
   };
 
   const analyze = () => {
@@ -135,35 +141,30 @@ export const useFrequencyAnalyzer = () => {
     animationFrameId = requestAnimationFrame(analyze);
   };
 
+  const cleanWorker = () => {
+    if (worker.value) {
+      worker.value.terminate();
+      worker.value = null;
+    }
+  };
+
   watch(isActive, (active) => {
     if (active) {
       initWorker();
       analyze();
     } else {
       cancelAnimationFrame(animationFrameId);
-      if (worker.value) {
-        worker.value.terminate();
-        worker.value = null;
-      }
+      cleanWorker();
       frequency.value = 0;
       clarity.value = 0;
     }
   });
 
-  watch(
-    currentTuning,
-    () => {
-      resetTuning();
-    },
-    { flush: "post" }
-  );
+  watch(() => currentTuning, resetTuning, { flush: "post" });
 
   onUnmounted(() => {
     cancelAnimationFrame(animationFrameId);
-    if (worker.value) {
-      worker.value.terminate();
-      worker.value = null;
-    }
+   cleanWorker()
   });
 
   return {

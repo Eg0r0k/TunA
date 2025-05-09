@@ -1,7 +1,7 @@
 import { PitchDetector } from "pitchy";
 import { TUNER_CONFIG } from "@/constants/tuner";
 
-let detector: PitchDetector<Float32Array>;
+let detector: PitchDetector<Float32Array> | null = null;
 
 self.onmessage = (
   e: MessageEvent<{ buffer: Float32Array; sampleRate: number }>
@@ -20,4 +20,9 @@ self.onmessage = (
   ) {
     self.postMessage({ pitch, clarity });
   }
+};
+
+//Clean up after close wenworker
+self.onclose = () => {
+  detector = null;
 };

@@ -48,6 +48,7 @@ export const getNoteName = (frequency: number): NoteWithOctave | null => {
     frequency > TUNER_CONFIG.MAX_FREQUENCY
   )
     return null;
+
   const appStore = useAppStore();
 
   const semitonesFromA4 =
