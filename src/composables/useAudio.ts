@@ -19,16 +19,7 @@ export const useAudio = () => {
       toast.error(t("errors.mediaApiError"));
       return;
     }
-
     try {
-      const permissionStatus = await navigator.permissions.query({
-        name: "microphone",
-      });
-      if (permissionStatus.state !== "granted") {
-        toast.error(t("errors.microphonePermissionDenied"));
-        return;
-      }
-
       cleanup();
 
       const newStream = await navigator.mediaDevices.getUserMedia({

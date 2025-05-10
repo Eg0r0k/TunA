@@ -153,7 +153,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Slider } from '@/components/ui/slider';
-import { Moon, Sun, Laptop, Check, Info, Github, GitPullRequest, Globe, CircleAlert } from 'lucide-vue-next';
+import { Moon, Sun, Laptop, Check, Info, Github, GitPullRequest, Globe } from 'lucide-vue-next';
 import { useAppStore } from '@/stores/appStore';
 import { computed, onBeforeMount, ref } from 'vue';
 import { getVersion } from '@tauri-apps/api/app';

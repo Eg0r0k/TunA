@@ -186,3 +186,8 @@ body {
 button {
   cursor: pointer !important;
 }
+
+.toaster * {
+  border-radius: var(--radius);
+  user-select: none;
+}
