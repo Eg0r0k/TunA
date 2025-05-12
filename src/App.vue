@@ -16,6 +16,22 @@ import WindowTitle from './WindowTitle.vue'
 import MainHeader from '@/components/header/MainHeader.vue';
 import { useColorMode } from '@vueuse/core';
 import { Toaster } from './components/ui/sonner';
+import { registerSW } from "virtual:pwa-register";
+import { toast } from "vue-sonner";
+import { useI18n } from 'vue-i18n';
 
+const { t } = useI18n();
+
+// The theme hook must be called from root
 useColorMode();
+
+registerSW({
+  //TODO: Add in to settings Button for installing new vestion and refresh current version SPA
+  onNeedRefresh() {
+    alert("need to refresh");
+  },
+  onOfflineReady() {
+    toast.success(t('tuner.readyToOffline'))
+  },
+});
 </script>

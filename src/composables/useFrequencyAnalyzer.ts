@@ -18,7 +18,7 @@ export const useFrequencyAnalyzer = () => {
 
   const suggestedNote = ref<NoteWithOctave | null>(null);
 
-  //Select first string
+  //Select first string by default
   const currentTuning = ref<Tuning>(INSTRUMENTS[0].tunings[0]);
   const tunedStrings = ref<Map<NoteWithOctave, TunedString>>(new Map());
   const selectedString = ref<NoteWithOctave | null>(null);
@@ -41,6 +41,7 @@ export const useFrequencyAnalyzer = () => {
 
   const checkTuning = (note: NoteWithOctave) => {
     if (!currentTuning.value || !note) return false;
+    if (!currentTuning.value.notes.includes(note)) return false;
 
     if (selectedString.value && note !== selectedString.value) {
       resetTuning();
@@ -76,7 +77,7 @@ export const useFrequencyAnalyzer = () => {
   };
 
   const accuracy = computed(() => {
-    if (frequency.value === 0) return 0;
+    if (frequency.value <= 0) return 0;
 
     const targetNote = selectedString.value || note.value;
     if (!targetNote) return 0;
@@ -141,11 +142,14 @@ export const useFrequencyAnalyzer = () => {
     animationFrameId = requestAnimationFrame(analyze);
   };
 
-  const cleanWorker = () => {
+  const clean = () => {
+    cancelAnimationFrame(animationFrameId);
     if (worker.value) {
       worker.value.terminate();
       worker.value = null;
     }
+    frequency.value = 0;
+    clarity.value = 0;
   };
 
   watch(isActive, (active) => {
@@ -153,18 +157,14 @@ export const useFrequencyAnalyzer = () => {
       initWorker();
       analyze();
     } else {
-      cancelAnimationFrame(animationFrameId);
-      cleanWorker();
-      frequency.value = 0;
-      clarity.value = 0;
+      clean();
     }
   });
 
   watch(() => currentTuning, resetTuning, { flush: "post" });
 
   onUnmounted(() => {
-    cancelAnimationFrame(animationFrameId);
-   cleanWorker()
+    clean();
   });
 
   return {

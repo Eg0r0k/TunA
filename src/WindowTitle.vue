@@ -1,5 +1,5 @@
 <template>
-    <nav role="toolbar" aria-label="Window controls" class="titlebar border-b" data-tauri-drag-region v-if="isTauriApp">
+    <nav role="toolbar" aria-label="Window controls" class="titlebar border-b" data-tauri-drag-region  v-if="isTauriApp">
         <div class="titlebar-text">
             <span v-for="(char, index) in animatedText" :key="index" class="titlebar-char"
                 :style="{ animationDelay: `${index * 0.1}s` }">

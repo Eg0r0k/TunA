@@ -51,6 +51,7 @@ export default {
     button: "<-- ВОЗВРАТ К ИНДЕКСУ",
   },
   tuner: {
+    readyToOffline: "Приложение готово работать в оффлайн режиме",
     selectInstrument: "Выберите инструмент",
     selectTuning: "Выберите настройку",
     start: "Запустить тюнер",

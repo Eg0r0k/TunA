@@ -52,6 +52,7 @@ export default {
     button: "<-- BACK TO INDEX",
   },
   tuner: {
+    readyToOffline: "The application is ready to work in offline mode",
     selectInstrument: "Select instrument",
     selectTuning: "Select tuning",
     start: "Start Tuner",

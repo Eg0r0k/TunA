@@ -14,7 +14,7 @@ interface SplitedNote {
 export const splitNote = (
   note: NoteWithOctave | null | undefined
 ): SplitedNote => {
-  if (!note) {
+  if (!note || typeof note !== "string") {
     return { name: "—", octave: "" };
   }
   const match = note.match(/^([A-G]#?)(-?\d+)$/);

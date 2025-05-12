@@ -54,7 +54,7 @@
                     <div class="gauge-zone"></div>
                     <div class="gauge-indicator" :style="{ transform: `rotate(${tunerStore.gaugeRotation}deg)` }"></div>
                     <div class="gauge-center"></div>
-                    <div class="gauge-marks">
+                    <div class="gauge-marks" v-once>
                         <div v-for="i in 11" :key="i" class="gauge-mark" :class="{ 'gauge-mark-center': i === 6 }"
                             :style="{ transform: `rotate(${-90 + (i - 1) * 18}deg)` }">
                         </div>
@@ -69,7 +69,7 @@
                     </div>
                     <div class="text-4xl font-bold text-foreground">
                         {{ tunerStore.noteParts.name }}<span class="text-xl ml-1">{{ tunerStore.noteParts.octave
-                            }}</span>
+                        }}</span>
                     </div>
                     <div class="text-muted-foreground text-lg">
                         {{ tunerStore.nextNote }}<span class="text-xs ml-1">{{ tunerStore.noteParts.octave }}</span>
@@ -102,7 +102,8 @@
             <div class="flex justify-center flex-wrap gap-4">
                 <button :aria-pressed="isSelected"
                     v-for="({ note, displayName, isCurrent, isTuned, isSelected, displayOctave }, index) in tunerStore.memoizedTuningState"
-                    :key="index" class="tuning-note px-4 py-2 rounded-lg transition-colors duration-200" :class="{
+                    :key="`${index}-${note}`" :aria-labelledby="`note-${note}`"
+                    class="tuning-note px-4 py-2 rounded-lg transition-colors duration-200" :class="{
                         'bg-secondary text-secondary-foreground': isCurrent,
                         'bg-primary text-primary-foreground': isTuned,
                         'ring-2 ring-accent': isSelected
@@ -188,6 +189,7 @@ const toggleStringSelection = (note: NoteWithOctave) => {
     width: 2px;
     height: 90%;
     background: var(--color-primary);
+    border-radius: 1px;
     transform-origin: bottom center;
     transition: transform 0.3s ease;
 }
