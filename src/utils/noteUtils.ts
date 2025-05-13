@@ -1,10 +1,6 @@
-import {
-  NOTES,
-  NoteWithOctave,
-  NoteName,
-  TUNER_CONFIG,
-} from "@/constants/tuner";
+import { NOTES, TUNER_CONFIG } from "@/constants/tuner";
 import { useAppStore } from "@/stores/appStore";
+import { NoteName, NoteWithOctave } from "@/types/tuner/notes";
 
 interface SplitedNote {
   name: NoteName | "—";

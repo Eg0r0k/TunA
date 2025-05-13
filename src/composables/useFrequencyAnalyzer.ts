@@ -1,8 +1,11 @@
 import { computed, onUnmounted, ref, shallowRef, watch } from "vue";
 import { useAudio } from "./useAudio";
-import { INSTRUMENTS, type Tuning } from "@/data/tunings";
-import { NoteWithOctave, TUNER_CONFIG } from "@/constants/tuner";
 import { getNoteName, getNoteFrequency } from "@/utils/noteUtils";
+import { NoteWithOctave } from "@/types/tuner/notes";
+import { INSTRUMENTS } from "@/data/tunings";
+import { Tuning } from "@/types/tuner/instruments";
+import { TUNER_CONFIG } from "@/constants/tuner";
+import { PitchWorkerMessage } from "@/types/worker";
 
 interface TunedString {
   note: string;
@@ -20,7 +23,7 @@ export const useFrequencyAnalyzer = () => {
 
   //Select first string by default
   const currentTuning = ref<Tuning>(INSTRUMENTS[0].tunings[0]);
-  const tunedStrings = ref<Map<NoteWithOctave, TunedString>>(new Map());
+  const tunedStrings = shallowRef<Map<NoteWithOctave, TunedString>>(new Map());
   const selectedString = ref<NoteWithOctave | null>(null);
 
   const note = computed(() => getNoteName(frequency.value));
@@ -100,9 +103,7 @@ export const useFrequencyAnalyzer = () => {
       { type: "module" }
     );
 
-    worker.value.onmessage = (
-      e: MessageEvent<{ pitch: number; clarity: number }>
-    ) => {
+    worker.value.onmessage = (e: MessageEvent<PitchWorkerMessage>) => {
       const { pitch, clarity: clarityValue } = e.data;
 
       frequency.value = pitch;
@@ -144,7 +145,7 @@ export const useFrequencyAnalyzer = () => {
 
   const clean = () => {
     cancelAnimationFrame(animationFrameId);
-    if (worker.value) {
+    if (worker.value && worker.value instanceof Worker) {
       worker.value.terminate();
       worker.value = null;
     }
@@ -152,12 +153,12 @@ export const useFrequencyAnalyzer = () => {
     clarity.value = 0;
   };
 
-  watch(isActive, (active) => {
-    if (active) {
+  watch(isActive, (newVal) => {
+    if (!newVal && worker.value) {
+      clean();
+    } else if (newVal) {
       initWorker();
       analyze();
-    } else {
-      clean();
     }
   });
 

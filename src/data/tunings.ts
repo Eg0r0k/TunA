@@ -1,16 +1,4 @@
-import { NoteWithOctave } from "@/constants/tuner";
-
-export interface Tuning {
-  id: string;
-  name: string;
-  notes: NoteWithOctave[];
-}
-
-export interface Instrument {
-  id: string;
-  name: string;
-  tunings: Tuning[];
-}
+import { Instrument } from "@/types/tuner/instruments";
 
 export const INSTRUMENTS: Instrument[] = [
   {

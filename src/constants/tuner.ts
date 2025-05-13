@@ -1,6 +1,5 @@
-export type NoteName = (typeof NOTES)[number];
-export type NoteWithOctave = `${NoteName}${number}`;
-export type SupportedLocale = (typeof SUPPORTED_LOCALES)[number];
+import { TunerConfig } from "@/types/tuner/config";
+import { NoteName } from "@/types/tuner/notes";
 
 export const DEFAULT_LOCALE = "en";
 export const SUPPORTED_LOCALES = ["ru", "en"] as const;
@@ -18,12 +17,9 @@ export const NOTES = [
   "A",
   "A#",
   "B",
-] as const;
+] as const satisfies readonly NoteName[];
 
-export const TUNER_CONFIG = {
-  //It is not recommended to set more or less than 8 thousand,
-  //is sufficient resolution, you need to set values ​​of the power of two:
-  //@exemple: 1024 -> 2048 -> 4096 -> 8192 -> 16384
+export const TUNER_CONFIG: TunerConfig = {
   FFT_SIZE: 8192,
   MIN_FREQUENCY: 20,
   MAX_FREQUENCY: 20000,
@@ -32,6 +28,5 @@ export const TUNER_CONFIG = {
   SMOOTHING_TIME: 0.2,
   GAUGE_MAX_ROTATION: 90,
   TUNING_DELAY: 200,
-  //Not recommended do less interval (bad for accuracy)
   UPDATE_INTERVAL: 100,
-} as const;
+} as const satisfies TunerConfig;

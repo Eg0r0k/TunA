@@ -69,7 +69,7 @@
                     </div>
                     <div class="text-4xl font-bold text-foreground">
                         {{ tunerStore.noteParts.name }}<span class="text-xl ml-1">{{ tunerStore.noteParts.octave
-                        }}</span>
+                            }}</span>
                     </div>
                     <div class="text-muted-foreground text-lg">
                         {{ tunerStore.nextNote }}<span class="text-xs ml-1">{{ tunerStore.noteParts.octave }}</span>
@@ -91,8 +91,7 @@
         </div>
 
         <div class="flex items-center gap-4">
-            <Button @click="tunerStore.isActive ? tunerStore.stop() : tunerStore.start()"
-                :variant="tunerStore.isActive ? 'destructive' : 'default'">
+            <Button @click="tunerStore.toggleTuner" :variant="tunerStore.isActive ? 'destructive' : 'default'">
                 {{ tunerStore.isActive ? $t('tuner.stop') : $t('tuner.start') }}
 
             </Button>
@@ -137,13 +136,13 @@ import {
     DialogTrigger,
 } from '@/components/ui/dialog';
 
-import { INSTRUMENTS, type Instrument, type Tuning } from '@/data/tunings';
-import { type NoteWithOctave } from '@/constants/tuner';
 import { splitNote } from '@/utils/noteUtils';
 import { useTunerStore } from '@/stores/tunerStore';
+import { NoteWithOctave } from '@/types/tuner/notes';
+import { INSTRUMENTS } from '@/data/tunings';
+import { Instrument, Tuning } from '@/types/tuner/instruments';
 
 const tunerStore = useTunerStore()
-
 
 const toggleStringSelection = (note: NoteWithOctave) => {
     tunerStore.setSelectedString(note === tunerStore.selectedString ? null : note);

@@ -1,6 +1,7 @@
 import { useFrequencyAnalyzer } from "@/composables/useFrequencyAnalyzer";
 import { TUNER_CONFIG } from "@/constants/tuner";
-import { Instrument, INSTRUMENTS, Tuning } from "@/data/tunings";
+import { INSTRUMENTS } from "@/data/tunings";
+import { Instrument, Tuning } from "@/types/tuner/instruments";
 import { getNextNote, getPrevNote, splitNote } from "@/utils/noteUtils";
 import { defineStore } from "pinia";
 import { computed, ref } from "vue";
@@ -74,6 +75,10 @@ export const useTunerStore = defineStore("tuner", () => {
     })
   );
 
+  const toggleTuner = () => {
+    isActive ? stop() : start();
+  };
+
   const handleInstrumentChange = (instrument: Instrument) => {
     currentInstrument.value = instrument;
     handleTuningChange(instrument.tunings[0]);
@@ -109,5 +114,6 @@ export const useTunerStore = defineStore("tuner", () => {
     handleInstrumentChange,
     handleTuningChange,
     setSelectedString,
+    toggleTuner
   };
 });

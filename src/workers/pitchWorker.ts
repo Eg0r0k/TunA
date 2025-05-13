@@ -1,11 +1,10 @@
 import { PitchDetector } from "pitchy";
 import { TUNER_CONFIG } from "@/constants/tuner";
+import { PitchWorkerInput } from "@/types/worker";
 
 let detector: PitchDetector<Float32Array> | null = null;
 
-self.onmessage = (
-  e: MessageEvent<{ buffer: Float32Array; sampleRate: number }>
-) => {
+self.onmessage = (e: MessageEvent<PitchWorkerInput>) => {
   const { buffer, sampleRate } = e.data;
 
   if (!detector) {
@@ -22,7 +21,7 @@ self.onmessage = (
   }
 };
 
-//Clean up after close wenworker
+//Clean up after close webworker
 self.onclose = () => {
   detector = null;
 };
