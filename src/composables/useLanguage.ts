@@ -1,8 +1,5 @@
-import {
-  DEFAULT_LOCALE,
-  SUPPORTED_LOCALES,
-  type SupportedLocale,
-} from "@/constants/tuner";
+import { DEFAULT_LOCALE, SUPPORTED_LOCALES } from "@/constants/tuner";
+import { type SupportedLocale } from "@/types/tuner/config";
 import { useStorage } from "@vueuse/core";
 import { computed } from "vue";
 import { useI18n } from "vue-i18n";

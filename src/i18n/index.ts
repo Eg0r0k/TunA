@@ -2,11 +2,8 @@ import { useNavigatorLanguage, useStorage } from "@vueuse/core";
 import { createI18n } from "vue-i18n";
 import ru from "@/i18n/locales/ru";
 import en from "@/i18n/locales/en";
-import {
-  DEFAULT_LOCALE,
-  SUPPORTED_LOCALES,
-  SupportedLocale,
-} from "@/constants/tuner";
+import { DEFAULT_LOCALE, SUPPORTED_LOCALES } from "@/constants/tuner";
+import { type SupportedLocale } from "@/types/tuner/config";
 
 const isSupportedLocale = (locale: string): locale is SupportedLocale => {
   return SUPPORTED_LOCALES.includes(locale as SupportedLocale);
