@@ -76,7 +76,7 @@ export const useTunerStore = defineStore("tuner", () => {
   );
 
   const toggleTuner = () => {
-    isActive ? stop() : start();
+    isActive.value ? stop() : start();
   };
 
   const handleInstrumentChange = (instrument: Instrument) => {
@@ -114,6 +114,6 @@ export const useTunerStore = defineStore("tuner", () => {
     handleInstrumentChange,
     handleTuningChange,
     setSelectedString,
-    toggleTuner
+    toggleTuner,
   };
 });
