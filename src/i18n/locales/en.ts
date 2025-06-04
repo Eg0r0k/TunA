@@ -53,6 +53,7 @@ export default {
   },
   tuner: {
     readyToOffline: "The application is ready to work in offline mode",
+    readyToRefresh: "The applicatoin needs to refresh",
     selectInstrument: "Select instrument",
     selectTuning: "Select tuning",
     start: "Start Tuner",
@@ -85,5 +86,6 @@ export default {
   general: {
     unknown: "Unknown",
     hertz: "Hz",
+    refresh: "Refresh",
   },
 };

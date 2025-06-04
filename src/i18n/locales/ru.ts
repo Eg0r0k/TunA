@@ -53,6 +53,7 @@ export default {
   tuner: {
     readyToOffline: "Приложение готово работать в оффлайн режиме",
     selectInstrument: "Выберите инструмент",
+    readyToRefresh: "Приложение нужно обновить",
     selectTuning: "Выберите настройку",
     start: "Запустить тюнер",
     stop: "Остановить тюнер",
@@ -84,5 +85,6 @@ export default {
   general: {
     unknown: "Неизвестно",
     hertz: "Гц",
+    refresh: "Обновить",
   },
 };
