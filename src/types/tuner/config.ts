@@ -46,4 +46,4 @@ export interface TunerConfig {
   UPDATE_INTERVAL: number;
 }
 
-export type SupportedLocale = "ru" | "en";
+export type SupportedLocale = "ru" | "en" | "zh" | "es" | "fr";

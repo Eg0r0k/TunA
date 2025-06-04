@@ -5,6 +5,9 @@ import en from "@/i18n/locales/en";
 import { DEFAULT_LOCALE } from "@/constants/tuner";
 import { type SupportedLocale } from "@/types/tuner/config";
 import { isSupportedLocale, setHtmlLangAttribute } from "@/lib/localeUtils";
+import zh from "./locales/zh";
+import es from "./locales/es";
+import fr from "./locales/fr";
 
 type MessageSchema = typeof en;
 
@@ -48,5 +51,8 @@ export const i18n = createI18n<[MessageSchema], SupportedLocale>({
   messages: {
     en,
     ru,
+    zh,
+    es,
+    fr,
   },
 });

@@ -2,7 +2,7 @@ import { TunerConfig } from "@/types/tuner/config";
 import { NoteName } from "@/types/tuner/notes";
 
 export const DEFAULT_LOCALE = "en";
-export const SUPPORTED_LOCALES = ["ru", "en"] as const;
+export const SUPPORTED_LOCALES = ["ru", "en", "es", "zh", "fr"] as const;
 
 export const NOTES = [
   "C",

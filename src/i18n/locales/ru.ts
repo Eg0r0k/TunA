@@ -1,7 +1,10 @@
 export default {
   locales: {
-    en: "Английский",
+    en: "English",
     ru: "Русский",
+    es: "Español",
+    zh: "中文",
+    fr: "Français",
   },
   errors: {
     microphoneNotFound: "Микрофон не найден",
