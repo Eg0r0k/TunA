@@ -1,4 +1,5 @@
 import { DEFAULT_LOCALE, SUPPORTED_LOCALES } from "@/constants/tuner";
+import { setHtmlLangAttribute } from "@/lib/localeUtils";
 import { type SupportedLocale } from "@/types/tuner/config";
 import { useStorage } from "@vueuse/core";
 import { computed } from "vue";
@@ -18,6 +19,7 @@ export const useLanguage = () => {
     set(newLocale: SupportedLocale) {
       storedLocale.value = newLocale;
       i18n.locale.value = newLocale;
+      setHtmlLangAttribute(newLocale);
     },
   });
 

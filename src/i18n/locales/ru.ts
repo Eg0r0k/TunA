@@ -44,6 +44,8 @@ export default {
     version: "Версия приложения",
     links: "Ссылки",
     github: "GitHub",
+    desktop: "Приложение",
+    web: "Веб",
     copyright: "© {year} TunA. Все права НЕ защищены. ⊂(◉‿◉)つ",
   },
   notFound: {
