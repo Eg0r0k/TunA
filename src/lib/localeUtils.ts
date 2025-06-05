@@ -1,5 +1,5 @@
 import { SUPPORTED_LOCALES } from "@/constants/tuner";
-import { SupportedLocale } from "@/types/tuner/config";
+import { SupportedLocale } from "@/i18n/messages";
 
 export const isSupportedLocale = (
   locale: string

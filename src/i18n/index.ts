@@ -1,15 +1,10 @@
 import { useNavigatorLanguage, useStorage } from "@vueuse/core";
 import { createI18n } from "vue-i18n";
-import ru from "@/i18n/locales/ru";
-import en from "@/i18n/locales/en";
 import { DEFAULT_LOCALE } from "@/constants/tuner";
-import { type SupportedLocale } from "@/types/tuner/config";
 import { isSupportedLocale, setHtmlLangAttribute } from "@/lib/localeUtils";
-import zh from "./locales/zh";
-import es from "./locales/es";
-import fr from "./locales/fr";
+import { type SupportedLocale, messages } from "./messages";
 
-type MessageSchema = typeof en;
+type MessageSchema = (typeof messages)["en"];
 
 const getSavedLocale = (): SupportedLocale | null => {
   const savedLocale = useStorage<SupportedLocale>(
@@ -48,11 +43,5 @@ export const i18n = createI18n<[MessageSchema], SupportedLocale>({
   legacy: false,
   locale: getInitialLocale(),
   fallbackLocale: DEFAULT_LOCALE,
-  messages: {
-    en,
-    ru,
-    zh,
-    es,
-    fr,
-  },
+  messages,
 });

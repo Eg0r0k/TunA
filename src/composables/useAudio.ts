@@ -96,7 +96,7 @@ export const useAudio = () => {
         audioContext.value.close().catch(console.error);
         audioContext.value = null;
       }
-    } catch (error) {
+    } catch (error: unknown) {
       console.error("Cleanup error:", error);
     }
   };

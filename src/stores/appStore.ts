@@ -27,6 +27,11 @@ export const useAppStore = defineStore(
         null
     );
 
+    const selectedDeviceId = computed({
+      get: () => state.selectedDeviceId || null,
+      set: (value) => setDevice(value || ""),
+    });
+
     const {
       devices: mediaDevices,
       isSupported,
@@ -61,6 +66,7 @@ export const useAppStore = defineStore(
       }
     };
 
+    //Select frequency[0] because Slider wants to get array into propts
     const setA4Frequency = (frequency: number[]) => {
       if (frequency[0] < 400 || frequency[0] > 500) {
         throw new Error("Frequency out of valid range (400-500Hz)");
@@ -76,13 +82,14 @@ export const useAppStore = defineStore(
         dark: "dark",
       },
     });
-
+    
     return {
       mode,
       state,
       audioDevices,
       ensurePermissions,
       selectedDevice,
+      selectedDeviceId,
       setDevice,
       setA4Frequency,
       isSupported,

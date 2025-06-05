@@ -8,7 +8,8 @@
 
       <div class="grid gap-4">
         <div class="flex items-center gap-4 truncate">
-          <Select v-model="selectedDeviceId" @update:model-value="(value) => handleDeviceChange(value as string)"
+          <Select v-model="appStore.selectedDeviceId"
+            @update:model-value="(value) => appStore.setDevice(value as string)"
             v-if="appStore.audioDevices.length > 0">
             <SelectTrigger class="w-full">
               <SelectValue :placeholder="$t('settings.audioSettings.selectMicrophone')" />
@@ -75,13 +76,13 @@
         <DropdownMenuTrigger as-child>
           <Button variant="outline" class="justify-between w-32 ">
             <div class="flex items-center gap-2">
-              <component :is="themes.find(t => t.id === appStore.mode)?.icon" class="size-4" />
+              <component :is="THEMES.find(t => t.id === appStore.mode)?.icon" class="size-4" />
               <span>{{ $t(`settings.theme.${appStore.mode}`) }}</span>
             </div>
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="start">
-          <DropdownMenuItem v-for="theme in themes" :key="theme.id"
+          <DropdownMenuItem v-for="theme in THEMES" :key="theme.id"
             @click="appStore.mode = theme.id as BasicColorSchema" class="gap-2">
             <component :is="theme.icon" class="size-4" />
             <span>{{ $t(`settings.theme.${theme.id}`) }}</span>
@@ -153,9 +154,9 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Slider } from '@/components/ui/slider';
-import { Moon, Sun, Laptop, Check, Info, Github, GitPullRequest, Globe } from 'lucide-vue-next';
+import { Check, Info, Github, GitPullRequest, Globe } from 'lucide-vue-next';
 import { useAppStore } from '@/stores/appStore';
-import { computed, onBeforeMount, ref } from 'vue';
+import { onBeforeMount } from 'vue';
 import { getVersion } from '@tauri-apps/api/app';
 import { Dialog, DialogContent, DialogTrigger, DialogTitle, DialogHeader } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
@@ -164,41 +165,16 @@ import { isTauri } from '@tauri-apps/api/core';
 import { BasicColorSchema } from '@vueuse/core';
 import { useLanguage } from '@/composables/useLanguage';
 import { useI18n } from 'vue-i18n';
-
+import { currentYear } from '@/utils/dateUrils';
+import { THEMES } from '@/constants/themes';
 const appStore = useAppStore();
 const { t } = useI18n()
-
-const appVersion = ref('');
-
+let appVersion = '';
 const { currentLocale, supportedLocale } = useLanguage()
-
-const currentYear = ref(new Date().getFullYear())
-
-const themes = [
-  { id: 'light', icon: Sun },
-  { id: 'dark', icon: Moon },
-  { id: 'system', icon: Laptop }
-]
-
-const selectedDeviceId = computed({
-  get: () => appStore.state.selectedDeviceId || null,
-  set: (value) => appStore.setDevice(value || ''),
-});
-
-const handleDeviceChange = async (deviceId: string | null) => {
-  try {
-
-    if (!deviceId) return;
-    await appStore.setDevice(deviceId);
-  } catch (error) {
-    console.error('Device change failed:', error);
-  }
-};
 
 onBeforeMount(async () => {
   try {
     await appStore.ensurePermissions();
-
     if (appStore.audioDevices.length > 0) {
       const defaultDevice = appStore.audioDevices.find(d =>
         d.deviceId === appStore.state.selectedDeviceId
@@ -211,15 +187,14 @@ onBeforeMount(async () => {
   } catch (error) {
     console.error('Device initialization error:', error);
   }
-
   try {
     if (isTauri()) {
-      appVersion.value = await getVersion();
+      appVersion = await getVersion();
     }
-    appVersion.value = __APP_VERSION__;
+    appVersion = __APP_VERSION__;
   } catch (error) {
     console.error('Ошибка при получении версии приложения:', error);
-    appVersion.value = isTauri() ? t('general.unknown') : __APP_VERSION__;
+    appVersion = isTauri() ? t('general.unknown') : __APP_VERSION__;
   }
 });
 </script>
