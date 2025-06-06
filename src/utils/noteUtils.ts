@@ -1,5 +1,5 @@
 import { NOTES, TUNER_CONFIG } from "@/constants/tuner";
-import { useAppStore } from "@/stores/appStore";
+import { useSettingsStore } from "@/stores/settingsStore";
 import { NoteName, NoteWithOctave } from "@/types/tuner/notes";
 
 interface SplitedNote {
@@ -7,6 +7,8 @@ interface SplitedNote {
   octave: string;
 }
 
+
+//TODO: Bad practics to import stores into utils funcs
 export const splitNote = (
   note: NoteWithOctave | null | undefined
 ): SplitedNote => {
@@ -29,12 +31,12 @@ export const getNoteFrequency = (note: NoteWithOctave) => {
   if (noteName === "—") {
     return 0;
   }
-  const appStore = useAppStore();
+  const settingsStore = useSettingsStore();
 
   const noteIndex = NOTES.indexOf(noteName);
   const a4Index = NOTES.indexOf("A");
   const semitonesFromA4 = noteIndex - a4Index + (parseInt(octave) - 4) * 12;
-  return appStore.state.a4Frequency[0] * Math.pow(2, semitonesFromA4 / 12);
+  return settingsStore.state.a4Frequency[0] * Math.pow(2, semitonesFromA4 / 12);
 };
 
 export const getNoteName = (frequency: number): NoteWithOctave | null => {
@@ -45,10 +47,10 @@ export const getNoteName = (frequency: number): NoteWithOctave | null => {
   )
     return null;
 
-  const appStore = useAppStore();
+  const settingsStore = useSettingsStore();
 
   const semitonesFromA4 =
-    12 * Math.log2(frequency / appStore.state.a4Frequency[0]);
+    12 * Math.log2(frequency / settingsStore.state.a4Frequency[0]);
   const midiNote = Math.round(semitonesFromA4 + 69);
   const noteIndex = midiNote % 12;
   const octave = Math.floor(midiNote / 12) - 1;

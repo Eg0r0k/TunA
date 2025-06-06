@@ -1,5 +1,5 @@
 <template>
-    <nav role="toolbar" aria-label="Window controls" class="titlebar border-b" data-tauri-drag-region  v-if="isTauriApp">
+    <nav role="toolbar" aria-label="Window controls" class="titlebar border-b" data-tauri-drag-region v-if="isTauriApp">
         <div class="titlebar-text">
             <span v-for="(char, index) in animatedText" :key="index" class="titlebar-char"
                 :style="{ animationDelay: `${index * 0.1}s` }">
@@ -24,9 +24,11 @@
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue';
 import { isTauri } from '@tauri-apps/api/core';
+import { Window } from '@tauri-apps/api/window';
 
 const isTauriApp = ref(false);
-const appWindow = ref<any>(null);
+
+const appWindow = ref<Window | null>(null);
 const isMaximized = ref(false);
 
 const titleText = '-=[TunA]=-';
