@@ -34,7 +34,7 @@ export default {
     theme: {
       light: "Светлая",
       dark: "Тёмная",
-      system: "Системная",
+      auto: "Системная",
     },
     language: {
       title: "Настройки языка",
@@ -91,5 +91,6 @@ export default {
     unknown: "Неизвестно",
     hertz: "Гц",
     refresh: "Обновить",
+    reset: "Сбросить",
   },
 };

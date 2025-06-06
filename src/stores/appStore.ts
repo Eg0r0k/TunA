@@ -1,10 +1,9 @@
-import { useColorMode, useDevicesList } from "@vueuse/core";
+import { useDevicesList } from "@vueuse/core";
 import { defineStore } from "pinia";
 import { computed, shallowReactive } from "vue";
 
 interface AppStateI {
   selectedDeviceId: string | null;
-  a4Frequency: number[];
 }
 
 export const useAppStore = defineStore(
@@ -12,8 +11,9 @@ export const useAppStore = defineStore(
   () => {
     const state = shallowReactive<AppStateI>({
       selectedDeviceId: null,
-      a4Frequency: [440],
     });
+
+    //TODO: Make this in composble because we dont need control it from here
 
     const audioDevices = computed(() =>
       mediaDevices.value.filter(
@@ -66,33 +66,14 @@ export const useAppStore = defineStore(
       }
     };
 
-    //Select frequency[0] because Slider wants to get array into propts
-    const setA4Frequency = (frequency: number[]) => {
-      if (frequency[0] < 400 || frequency[0] > 500) {
-        throw new Error("Frequency out of valid range (400-500Hz)");
-      }
-      state.a4Frequency = frequency;
-    };
-
-    const mode = useColorMode({
-      attribute: "class",
-      modes: {
-        auto: "auto",
-        light: "light",
-        dark: "dark",
-      },
-    });
-    
     return {
-      mode,
       state,
       audioDevices,
-      ensurePermissions,
       selectedDevice,
       selectedDeviceId,
-      setDevice,
-      setA4Frequency,
       isSupported,
+      ensurePermissions,
+      setDevice,
     };
   },
   {

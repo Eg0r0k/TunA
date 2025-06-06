@@ -19,7 +19,7 @@ export const NOTES = [
   "B",
 ] as const satisfies readonly NoteName[];
 
-export const TUNER_CONFIG: TunerConfig = {
+export const TUNER_CONFIG = {
   FFT_SIZE: 8192,
   MIN_FREQUENCY: 20,
   MAX_FREQUENCY: 20000,

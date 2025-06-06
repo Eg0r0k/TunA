@@ -37,8 +37,8 @@
         <p class="text-sm text-muted-foreground">{{ $t('settings.a4Calibration.description') }}</p>
       </div>
       <div class="flex items-center gap-4 flex-wrap">
-        <Slider v-model="appStore.state.a4Frequency" :min="400" :max="480" :step="1" class="w-[200px]" />
-        <span class="text-sm text-muted-foreground text-nowrap">{{ appStore.state.a4Frequency }} {{
+        <Slider v-model="settingsStore.state.a4Frequency" :min="400" :max="480" :step="1" class="w-[200px]" />
+        <span class="text-sm text-muted-foreground text-nowrap">{{ settingsStore.state.a4Frequency }} {{
           $t('general.hertz') }}</span>
       </div>
     </div>
@@ -76,22 +76,24 @@
         <DropdownMenuTrigger as-child>
           <Button variant="outline" class="justify-between w-32 ">
             <div class="flex items-center gap-2">
-              <component :is="THEMES.find(t => t.id === appStore.mode)?.icon" class="size-4" />
-              <span>{{ $t(`settings.theme.${appStore.mode}`) }}</span>
+              <component :is="THEMES.find(t => t.id === settingsStore.mode)?.icon" class="size-4" />
+              <span>{{ $t(`settings.theme.${settingsStore.mode}`) }}</span>
             </div>
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="start">
-          <DropdownMenuItem v-for="theme in THEMES" :key="theme.id"
-            @click="appStore.mode = theme.id as BasicColorSchema" class="gap-2">
+          <DropdownMenuItem v-for="theme in THEMES" :key="theme.id" @click="settingsStore.changeTheme(theme.id)"
+            class="gap-2">
             <component :is="theme.icon" class="size-4" />
             <span>{{ $t(`settings.theme.${theme.id}`) }}</span>
-            <Check v-show="appStore.mode === theme.id" class="ml-auto size-4" />
+            <Check v-show="settingsStore.mode === theme.id" class="ml-auto size-4" />
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
     </div>
-
+    <Button @click="settingsStore.resetSettings" variant="destructive">
+      [= {{ $t('general.reset') }} =]
+    </Button>
     <div class="flex justify-center gap-4">
       <Dialog>
         <DialogTrigger as-child>
@@ -162,12 +164,14 @@ import { Dialog, DialogContent, DialogTrigger, DialogTitle, DialogHeader } from 
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { isTauri } from '@tauri-apps/api/core';
-import { BasicColorSchema } from '@vueuse/core';
 import { useLanguage } from '@/composables/useLanguage';
 import { useI18n } from 'vue-i18n';
 import { currentYear } from '@/utils/dateUrils';
 import { THEMES } from '@/constants/themes';
+import { useSettingsStore } from '@/stores/settingsStore';
 const appStore = useAppStore();
+const settingsStore = useSettingsStore()
+
 const { t } = useI18n()
 let appVersion = '';
 const { currentLocale, supportedLocale } = useLanguage()

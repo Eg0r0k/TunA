@@ -1,7 +1,7 @@
 import { useNavigatorLanguage, useStorage } from "@vueuse/core";
 import { createI18n } from "vue-i18n";
 import { DEFAULT_LOCALE } from "@/constants/tuner";
-import { isSupportedLocale, setHtmlLangAttribute } from "@/lib/localeUtils";
+import { isSupportedLocale, setHtmlLangAttribute } from "@/utils/localeUtils";
 import { type SupportedLocale, messages } from "./messages";
 
 type MessageSchema = (typeof messages)["en"];

@@ -1,5 +1,21 @@
 import { Instrument } from "@/types/tuner/instruments";
 
+//TODO: If a local database is added in the future, this needs to be moved there so it doesn't have to be kept in memory
+
+/* Presumptive scheme:
+  {
+    id: auto
+    name: string
+    custom: boolean 
+    tunings: Array
+  }
+
+  Must have methods:
+  - CREATE 
+  - DELETE 
+  - UPDATE 
+  - GET 
+*/
 export const INSTRUMENTS: Instrument[] = [
   {
     id: "guitar",

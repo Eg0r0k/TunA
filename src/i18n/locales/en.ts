@@ -33,7 +33,7 @@ export default {
     theme: {
       light: "Light",
       dark: "Dark",
-      system: "System",
+      auto: "System",
     },
     language: {
       title: "Language Settings",
@@ -90,5 +90,6 @@ export default {
     unknown: "Unknown",
     hertz: "Hz",
     refresh: "Refresh",
+    reset: "Reset"
   },
 };

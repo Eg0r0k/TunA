@@ -4,6 +4,14 @@ import { PitchWorkerInput } from "@/types/worker";
 
 let detector: PitchDetector<Float32Array> | null = null;
 
+const isValidPitch = (pitch: number, clarity: number): boolean => {
+  return (
+    clarity > TUNER_CONFIG.MIN_CLARITY &&
+    pitch >= TUNER_CONFIG.MIN_FREQUENCY &&
+    pitch <= TUNER_CONFIG.MAX_FREQUENCY
+  );
+};
+
 self.onmessage = (e: MessageEvent<PitchWorkerInput>) => {
   const { buffer, sampleRate } = e.data;
 
@@ -12,16 +20,12 @@ self.onmessage = (e: MessageEvent<PitchWorkerInput>) => {
   }
   const [pitch, clarity] = detector.findPitch(buffer, sampleRate);
 
-  if (
-    clarity > TUNER_CONFIG.MIN_CLARITY &&
-    pitch >= TUNER_CONFIG.MIN_FREQUENCY &&
-    pitch <= TUNER_CONFIG.MAX_FREQUENCY
-  ) {
+  if (isValidPitch(pitch, clarity)) {
     self.postMessage({ pitch, clarity });
   }
 };
 
-//Clean up after close webworker
+//Clean up after closewebworker
 self.onclose = () => {
   detector = null;
 };

@@ -10,14 +10,15 @@ export const useTunerStore = defineStore("tuner", () => {
   const {
     accuracy,
     isActive,
-    start,
-    stop,
     frequency,
     suggestedNote,
     currentTuning,
-    setTuning,
     tunedStrings,
     selectedString,
+
+    start,
+    stop,
+    setTuning,
     setSelectedString,
     resetTuning,
   } = useFrequencyAnalyzer();
@@ -28,10 +29,13 @@ export const useTunerStore = defineStore("tuner", () => {
   const prevNote = computed(() => getPrevNote(noteParts.value.name));
   const nextNote = computed(() => getNextNote(noteParts.value.name));
 
+  const ACCURACY_THRESHOLD_LOW = 0.1;
+  const ACCURACY_THRESHOLD_MEDIUM = 0.3;
+
   const accuracyTextColor = computed(() => {
     const acc = Math.abs(accuracy.value);
-    if (acc < 0.1) return "text-primary";
-    if (acc < 0.3) return "text-yellow-500";
+    if (acc < ACCURACY_THRESHOLD_LOW) return "text-primary";
+    if (acc < ACCURACY_THRESHOLD_MEDIUM) return "text-yellow-500";
     return "text-destructive";
   });
 
@@ -46,19 +50,22 @@ export const useTunerStore = defineStore("tuner", () => {
     );
   });
 
+  const getTuningStatus = (accuracyValue: number): string => {
+    if (Math.abs(accuracyValue) < TUNER_CONFIG.TUNING_THRESHOLD)
+      return "inTune";
+    return accuracyValue > 0 ? "tuneDown" : "tuneUp";
+  };
   // We return the status as strings for i18n
   // exemple: tuneUp -> tuner.status.tuneUp = status in the required language
   const accuracyStatus = computed(() => {
     if (!frequency.value) return "default";
+
     if (selectedString.value) {
       if (suggestedNote.value !== selectedString.value) return "wrongString";
-      if (Math.abs(accuracy.value) < TUNER_CONFIG.TUNING_THRESHOLD)
-        return "inTune";
-      return accuracy.value > 0 ? "tuneDown" : "tuneUp";
+      return getTuningStatus(accuracy.value);
     }
-    if (Math.abs(accuracy.value) < TUNER_CONFIG.TUNING_THRESHOLD)
-      return "inTune";
-    return accuracy.value > 0 ? "tooHigh" : "tooLow";
+
+    return getTuningStatus(accuracy.value);
   });
 
   const memoizedTuningState = computed(() =>

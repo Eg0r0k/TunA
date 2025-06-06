@@ -1,7 +1,13 @@
-import { Laptop, Moon, Sun } from "lucide-vue-next";
+import { type BasicColorSchema } from "@vueuse/core";
+import { Laptop, LucideIcon, Moon, Sun } from "lucide-vue-next";
 
-export const THEMES = [
+interface Theme {
+  id: BasicColorSchema;
+  icon: LucideIcon;
+}
+
+export const THEMES: Theme[] = [
   { id: "light", icon: Sun },
   { id: "dark", icon: Moon },
-  { id: "system", icon: Laptop },
+  { id: "auto", icon: Laptop },
 ];

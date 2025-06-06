@@ -1,9 +1,10 @@
-import { NoteWithOctave } from "./notes";
+import { type NoteWithOctave } from "./notes";
 
 export interface Tuning {
   id: string;
   name: string;
   notes: NoteWithOctave[];
+  custom?: boolean;
 }
 
 export interface Instrument {

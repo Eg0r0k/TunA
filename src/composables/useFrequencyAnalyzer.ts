@@ -28,55 +28,62 @@ export const useFrequencyAnalyzer = () => {
 
   const note = computed(() => getNoteName(frequency.value));
 
-  const setTuning = (tuning: Tuning) => {
+  const setTuning = (tuning: Tuning): void => {
     currentTuning.value = tuning;
     selectedString.value = null;
   };
 
-  const resetTuning = () => {
+  const resetTuning = (): void => {
     tunedStrings.value.clear();
   };
 
-  const setSelectedString = (note: NoteWithOctave | null) => {
+  const setSelectedString = (note: NoteWithOctave | null): void => {
     selectedString.value = note;
     resetTuning();
   };
 
-  const checkTuning = (note: NoteWithOctave) => {
-    if (!currentTuning.value || !note) return false;
-    if (!currentTuning.value.notes.includes(note)) return false;
+  const updateStringState = (targetString: NoteWithOctave): void => {
+    const now = performance.now();
+    const stringState: TunedString = tunedStrings.value.get(targetString) || {
+      note: targetString,
+      timestamp: now,
+      tuned: false,
+    };
 
+    if (
+      now - stringState.timestamp >= TUNER_CONFIG.TUNING_DELAY &&
+      !stringState.tuned
+    ) {
+      stringState.tuned = true;
+    }
+    tunedStrings.value.set(targetString, stringState);
+  };
+
+  const isNoteInTuning = (note: NoteWithOctave): boolean => {
+    return !!currentTuning.value?.notes.includes(note);
+  };
+  const shouldMarkAsTuned = (accuracyValue: number): boolean => {
+    return accuracyValue < TUNER_CONFIG.TUNING_THRESHOLD;
+  };
+
+  //! Looks not like 'GOOD' codding
+  const checkTuning = (note: NoteWithOctave) => {
+    if (!currentTuning.value || !note || !isNoteInTuning(note)) return false;
     if (selectedString.value && note !== selectedString.value) {
       resetTuning();
       return false;
     }
 
     const accuracyValue = Math.abs(accuracy.value);
-
     const targetString = currentTuning.value.notes.find((n) => n === note);
 
     if (!targetString) return false;
-
-    if (accuracyValue < 0.1) {
-      const now = performance.now();
-      const stringState: TunedString = tunedStrings.value.get(targetString) || {
-        note: targetString,
-        timestamp: now,
-        tuned: false,
-      };
-      if (
-        now - stringState.timestamp >= TUNER_CONFIG.TUNING_DELAY &&
-        !stringState.tuned
-      ) {
-        stringState.tuned = true;
-      }
-
-      tunedStrings.value.set(targetString, stringState);
-      return stringState.tuned;
-    } else {
-      tunedStrings.value.delete(targetString);
-      return false;
+    if (shouldMarkAsTuned(accuracyValue)) {
+      updateStringState(targetString);
+      return tunedStrings.value.get(targetString)?.tuned ?? false;
     }
+    tunedStrings.value.delete(targetString);
+    return false;
   };
 
   const accuracy = computed(() => {
@@ -93,9 +100,12 @@ export const useFrequencyAnalyzer = () => {
   let animationFrameId: number;
   let lastAnalysisTime = 0;
 
+  // We use a worker because of the large number of constant frequency calculations,
+  // the frequency of calculations is set in the tuner config `/constants/tuner.ts`
+
   const worker = shallowRef<Worker | null>(null);
 
-  const initWorker = () => {
+  const initWorker = (): void => {
     if (worker.value) return;
 
     worker.value = new Worker(
@@ -121,7 +131,7 @@ export const useFrequencyAnalyzer = () => {
     };
   };
 
-  const analyze = () => {
+  const analyze = (): void => {
     if (!analyser.value || !isActive.value || !worker.value) return;
 
     const now = performance.now();
@@ -143,7 +153,7 @@ export const useFrequencyAnalyzer = () => {
     animationFrameId = requestAnimationFrame(analyze);
   };
 
-  const clean = () => {
+  const clean = (): void => {
     cancelAnimationFrame(animationFrameId);
     if (worker.value && worker.value instanceof Worker) {
       worker.value.terminate();
@@ -173,14 +183,15 @@ export const useFrequencyAnalyzer = () => {
     note,
     accuracy,
     isActive,
-    start,
-    stop,
     suggestedNote,
     currentTuning,
-    setTuning,
     tunedStrings,
-    resetTuning,
     selectedString,
+
+    start,
+    stop,
+    setTuning,
+    resetTuning,
     setSelectedString,
   };
 };

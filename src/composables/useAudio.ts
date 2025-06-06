@@ -13,6 +13,7 @@ export const useAudio = () => {
   const isActive = ref(false);
   const sourceNode = shallowRef<MediaStreamAudioSourceNode | null>(null);
 
+  //! Needs to improve !
   const start = async () => {
     if (!appStore.isSupported) {
       console.error("MediaDevices API is not supported");
@@ -22,6 +23,7 @@ export const useAudio = () => {
     try {
       cleanup();
 
+      // I don't think this is the best place to call mediaDevices
       const newStream = await navigator.mediaDevices.getUserMedia({
         audio: {
           deviceId: appStore.state.selectedDeviceId
@@ -35,9 +37,11 @@ export const useAudio = () => {
 
       stream.value = newStream;
 
+      // Create new AudioContext for analysis
       const context = new AudioContext();
       audioContext.value = context;
 
+      // Continue the context if the browser has paused it
       if (context.state === "suspended") {
         await context.resume();
       }
@@ -80,18 +84,22 @@ export const useAudio = () => {
 
   const cleanup = () => {
     try {
+      // 1. Clean source node
       if (sourceNode.value) {
         sourceNode.value.disconnect();
         sourceNode.value = null;
       }
+      // 2. Clean analyser 
       if (analyser.value) {
         analyser.value.disconnect();
         analyser.value = null;
       }
+      // 3. Clean streams
       if (stream.value) {
         stream.value.getTracks().forEach((track) => track.stop());
         stream.value = null;
       }
+      // 4. Clean audio context 
       if (audioContext.value && audioContext.value.state !== "closed") {
         audioContext.value.close().catch(console.error);
         audioContext.value = null;

@@ -33,7 +33,7 @@ export default {
     theme: {
       light: "浅色",
       dark: "深色",
-      system: "系统",
+      auto: "系统",
     },
     language: {
       title: "语言设置",
@@ -89,5 +89,6 @@ export default {
     unknown: "未知",
     hertz: "赫兹",
     refresh: "刷新",
+    reset: "重置",
   },
 };
