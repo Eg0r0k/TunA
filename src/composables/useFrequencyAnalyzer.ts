@@ -6,6 +6,8 @@ import { INSTRUMENTS } from "@/data/tunings";
 import { Tuning } from "@/types/tuner/instruments";
 import { TUNER_CONFIG } from "@/constants/tuner";
 import { PitchWorkerMessage } from "@/types/worker";
+import { useSettingsStore } from "@/stores/settingsStore";
+import { usePitchWorker } from "./usePitchWorker";
 
 interface TunedString {
   note: string;
@@ -13,6 +15,9 @@ interface TunedString {
   tuned: boolean;
   notes?: NoteWithOctave[];
 }
+const ACCURACY_MIN = -0.5;
+const ACCURACY_MAX = 0.5;
+const CENTS_PER_SEMITONE = 100;
 
 export const useFrequencyAnalyzer = () => {
   const { analyser, isActive, start, stop } = useAudio();
@@ -20,13 +25,14 @@ export const useFrequencyAnalyzer = () => {
   const clarity = ref(0);
 
   const suggestedNote = ref<NoteWithOctave | null>(null);
-
+  const settingsStore = useSettingsStore();
+  const a4Frequency = settingsStore.state.a4Frequency[0];
   //Select first string by default
   const currentTuning = ref<Tuning>(INSTRUMENTS[0].tunings[0]);
   const tunedStrings = shallowRef<Map<NoteWithOctave, TunedString>>(new Map());
   const selectedString = ref<NoteWithOctave | null>(null);
 
-  const note = computed(() => getNoteName(frequency.value));
+  const note = computed(() => getNoteName(frequency.value, a4Frequency));
 
   const setTuning = (tuning: Tuning): void => {
     currentTuning.value = tuning;
@@ -66,7 +72,6 @@ export const useFrequencyAnalyzer = () => {
     return accuracyValue < TUNER_CONFIG.TUNING_THRESHOLD;
   };
 
-  //! Looks not like 'GOOD' codding
   const checkTuning = (note: NoteWithOctave) => {
     if (!currentTuning.value || !note || !isNoteInTuning(note)) return false;
     if (selectedString.value && note !== selectedString.value) {
@@ -74,7 +79,7 @@ export const useFrequencyAnalyzer = () => {
       return false;
     }
 
-    const accuracyValue = Math.abs(accuracy.value);
+    const accuracyValue = Math.abs(tuningAccuracy.value);
     const targetString = currentTuning.value.notes.find((n) => n === note);
 
     if (!targetString) return false;
@@ -86,49 +91,40 @@ export const useFrequencyAnalyzer = () => {
     return false;
   };
 
-  const accuracy = computed(() => {
+  const tuningAccuracy = computed(() => {
     if (frequency.value <= 0) return 0;
 
     const targetNote = selectedString.value || note.value;
     if (!targetNote) return 0;
 
-    const targetFreq = getNoteFrequency(targetNote);
+    const targetFreq = getNoteFrequency(targetNote, a4Frequency);
     const cents = 1200 * Math.log2(frequency.value / targetFreq);
-    return Math.max(-0.5, Math.min(0.5, cents / 100));
+    return Math.max(
+      ACCURACY_MIN,
+      Math.min(ACCURACY_MAX, cents / CENTS_PER_SEMITONE)
+    );
   });
-
   let animationFrameId: number;
   let lastAnalysisTime = 0;
 
   // We use a worker because of the large number of constant frequency calculations,
   // the frequency of calculations is set in the tuner config `/constants/tuner.ts`
+  const { worker, initWorker, terminateWorker } = usePitchWorker();
 
-  const worker = shallowRef<Worker | null>(null);
-
-  const initWorker = (): void => {
-    if (worker.value) return;
-
-    worker.value = new Worker(
-      new URL("../workers/pitchWorker.ts", import.meta.url),
-      { type: "module" }
-    );
-
-    worker.value.onmessage = (e: MessageEvent<PitchWorkerMessage>) => {
-      const { pitch, clarity: clarityValue } = e.data;
+  const setupWorker = (): void => {
+    initWorker((data: PitchWorkerMessage) => {
+      const { pitch, clarity: clarityValue } = data;
 
       frequency.value = pitch;
       clarity.value = clarityValue;
-      const newNote = getNoteName(pitch);
+
+      const newNote = getNoteName(pitch, settingsStore.state.a4Frequency[0]);
 
       if (newNote && newNote !== suggestedNote.value) {
         suggestedNote.value = newNote;
         checkTuning(newNote);
       }
-    };
-    worker.value.onerror = (e) => {
-      console.error("Worker error:", e);
-      stop();
-    };
+    });
   };
 
   const analyze = (): void => {
@@ -155,10 +151,7 @@ export const useFrequencyAnalyzer = () => {
 
   const clean = (): void => {
     cancelAnimationFrame(animationFrameId);
-    if (worker.value && worker.value instanceof Worker) {
-      worker.value.terminate();
-      worker.value = null;
-    }
+    terminateWorker();
     frequency.value = 0;
     clarity.value = 0;
   };
@@ -167,7 +160,7 @@ export const useFrequencyAnalyzer = () => {
     if (!newVal && worker.value) {
       clean();
     } else if (newVal) {
-      initWorker();
+      setupWorker();
       analyze();
     }
   });
@@ -181,7 +174,7 @@ export const useFrequencyAnalyzer = () => {
   return {
     frequency,
     note,
-    accuracy,
+    tuningAccuracy,
     isActive,
     suggestedNote,
     currentTuning,

@@ -1,14 +1,14 @@
 import { NOTES, TUNER_CONFIG } from "@/constants/tuner";
-import { useSettingsStore } from "@/stores/settingsStore";
 import { NoteName, NoteWithOctave } from "@/types/tuner/notes";
 
 interface SplitedNote {
   name: NoteName | "—";
   octave: string;
 }
+const MIDI_A4 = 69;
+const SEMITONES_IN_OCTAVE = 12;
+const BASE_OCTAVE = 4;
 
-
-//TODO: Bad practics to import stores into utils funcs
 export const splitNote = (
   note: NoteWithOctave | null | undefined
 ): SplitedNote => {
@@ -26,20 +26,25 @@ export const splitNote = (
   };
 };
 
-export const getNoteFrequency = (note: NoteWithOctave) => {
+export const getNoteFrequency = (note: NoteWithOctave, a4Frequency: number) => {
   const { name: noteName, octave } = splitNote(note);
   if (noteName === "—") {
     return 0;
   }
-  const settingsStore = useSettingsStore();
 
   const noteIndex = NOTES.indexOf(noteName);
   const a4Index = NOTES.indexOf("A");
-  const semitonesFromA4 = noteIndex - a4Index + (parseInt(octave) - 4) * 12;
-  return settingsStore.state.a4Frequency[0] * Math.pow(2, semitonesFromA4 / 12);
+  const semitonesFromA4 =
+    noteIndex -
+    a4Index +
+    (parseInt(octave) - BASE_OCTAVE) * SEMITONES_IN_OCTAVE;
+  return a4Frequency * Math.pow(2, semitonesFromA4 / SEMITONES_IN_OCTAVE);
 };
 
-export const getNoteName = (frequency: number): NoteWithOctave | null => {
+export const getNoteName = (
+  frequency: number,
+  a4Frequency: number
+): NoteWithOctave | null => {
   if (
     !frequency ||
     frequency < TUNER_CONFIG.MIN_FREQUENCY ||
@@ -47,26 +52,28 @@ export const getNoteName = (frequency: number): NoteWithOctave | null => {
   )
     return null;
 
-  const settingsStore = useSettingsStore();
-
   const semitonesFromA4 =
-    12 * Math.log2(frequency / settingsStore.state.a4Frequency[0]);
-  const midiNote = Math.round(semitonesFromA4 + 69);
-  const noteIndex = midiNote % 12;
-  const octave = Math.floor(midiNote / 12) - 1;
+    Math.log2(frequency / a4Frequency) * SEMITONES_IN_OCTAVE;
+  const midiNote = Math.round(semitonesFromA4 + MIDI_A4);
+  const noteIndex = midiNote % SEMITONES_IN_OCTAVE;
+  const octave = Math.floor(midiNote / SEMITONES_IN_OCTAVE) - 1;
   const noteName = NOTES[noteIndex];
 
   return `${noteName}${octave}` as NoteWithOctave;
 };
 
-export const getPrevNote = (note: string) => {
-  const index = NOTES.indexOf(note as NoteName);
+const findNoteIndex = (noteName: string): number => {
+  return NOTES.indexOf(noteName as NoteName);
+};
+
+export const getPrevNote = (note: string): NoteName | "—" => {
+  const index = findNoteIndex(note);
   if (index === -1) return "—";
   return NOTES[(index - 1 + NOTES.length) % NOTES.length];
 };
 
-export const getNextNote = (note: string) => {
-  const index = NOTES.indexOf(note as NoteName);
+export const getNextNote = (note: string): NoteName | "—" => {
+  const index = findNoteIndex(note);
   if (index === -1) return "—";
   return NOTES[(index + 1) % NOTES.length];
 };

@@ -8,7 +8,7 @@ import { computed, ref } from "vue";
 
 export const useTunerStore = defineStore("tuner", () => {
   const {
-    accuracy,
+    tuningAccuracy,
     isActive,
     frequency,
     suggestedNote,
@@ -33,7 +33,7 @@ export const useTunerStore = defineStore("tuner", () => {
   const ACCURACY_THRESHOLD_MEDIUM = 0.3;
 
   const accuracyTextColor = computed(() => {
-    const acc = Math.abs(accuracy.value);
+    const acc = Math.abs(tuningAccuracy.value);
     if (acc < ACCURACY_THRESHOLD_LOW) return "text-primary";
     if (acc < ACCURACY_THRESHOLD_MEDIUM) return "text-yellow-500";
     return "text-destructive";
@@ -46,7 +46,8 @@ export const useTunerStore = defineStore("tuner", () => {
   const gaugeRotation = computed(() => {
     if (!frequency.value) return 0;
     return (
-      Math.round(accuracy.value * TUNER_CONFIG.GAUGE_MAX_ROTATION * 100) / 100
+      Math.round(tuningAccuracy.value * TUNER_CONFIG.GAUGE_MAX_ROTATION * 100) /
+      100
     );
   });
 
@@ -62,10 +63,10 @@ export const useTunerStore = defineStore("tuner", () => {
 
     if (selectedString.value) {
       if (suggestedNote.value !== selectedString.value) return "wrongString";
-      return getTuningStatus(accuracy.value);
+      return getTuningStatus(tuningAccuracy.value);
     }
 
-    return getTuningStatus(accuracy.value);
+    return getTuningStatus(tuningAccuracy.value);
   });
 
   const memoizedTuningState = computed(() =>
@@ -101,7 +102,7 @@ export const useTunerStore = defineStore("tuner", () => {
     currentInstrument,
     selectedString,
 
-    accuracy,
+    tuningAccuracy,
     isActive,
     frequency,
     suggestedNote,
