@@ -2,13 +2,13 @@ import { BasicColorSchema, useColorMode } from "@vueuse/core";
 import { defineStore } from "pinia";
 import { shallowReactive } from "vue";
 
-interface SettingsStateI {
+interface SettingsState {
   a4Frequency: number[];
 }
 export const useSettingsStore = defineStore(
   "settings",
   () => {
-    const state = shallowReactive<SettingsStateI>({
+    const state = shallowReactive<SettingsState>({
       a4Frequency: [440],
     });
     const mode = useColorMode({
@@ -31,9 +31,10 @@ export const useSettingsStore = defineStore(
       }
       state.a4Frequency = frequency;
     };
-    // TODO: Make base object to reset it
     const resetSettings = (): void => {
-      state.a4Frequency = [440];
+      Object.assign(state, {
+        a4Frequency: [440],
+      });
     };
     return {
       state,

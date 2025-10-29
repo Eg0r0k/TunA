@@ -4,7 +4,7 @@ import { getNoteName, getNoteFrequency } from "@/utils/noteUtils";
 import { NoteWithOctave } from "@/types/tuner/notes";
 import { INSTRUMENTS } from "@/data/tunings";
 import { Tuning } from "@/types/tuner/instruments";
-import { TUNER_CONFIG } from "@/constants/tuner";
+import { TUNER_CONFIG, TUNER_CONSTANTS } from "@/constants/tuner";
 import { PitchWorkerMessage } from "@/types/worker";
 import { useSettingsStore } from "@/stores/settingsStore";
 import { usePitchWorker } from "./usePitchWorker";
@@ -15,9 +15,6 @@ interface TunedString {
   tuned: boolean;
   notes?: NoteWithOctave[];
 }
-const ACCURACY_MIN = -0.5;
-const ACCURACY_MAX = 0.5;
-const CENTS_PER_SEMITONE = 100;
 
 export const useFrequencyAnalyzer = () => {
   const { analyser, isActive, start, stop } = useAudio();
@@ -100,8 +97,11 @@ export const useFrequencyAnalyzer = () => {
     const targetFreq = getNoteFrequency(targetNote, a4Frequency);
     const cents = 1200 * Math.log2(frequency.value / targetFreq);
     return Math.max(
-      ACCURACY_MIN,
-      Math.min(ACCURACY_MAX, cents / CENTS_PER_SEMITONE)
+      TUNER_CONSTANTS.ACCURACY.MIN,
+      Math.min(
+        TUNER_CONSTANTS.ACCURACY.MAX,
+        cents / TUNER_CONSTANTS.PITCH.CENTS_PER_SEMITONE
+      )
     );
   });
   let animationFrameId: number;
@@ -109,6 +109,7 @@ export const useFrequencyAnalyzer = () => {
 
   // We use a worker because of the large number of constant frequency calculations,
   // the frequency of calculations is set in the tuner config `/constants/tuner.ts`
+
   const { worker, initWorker, terminateWorker } = usePitchWorker();
 
   const setupWorker = (): void => {

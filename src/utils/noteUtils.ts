@@ -1,13 +1,10 @@
-import { NOTES, TUNER_CONFIG } from "@/constants/tuner";
+import { NOTES, TUNER_CONFIG, TUNER_CONSTANTS } from "@/constants/tuner";
 import { NoteName, NoteWithOctave } from "@/types/tuner/notes";
 
 interface SplitedNote {
   name: NoteName | "—";
   octave: string;
 }
-const MIDI_A4 = 69;
-const SEMITONES_IN_OCTAVE = 12;
-const BASE_OCTAVE = 4;
 
 export const splitNote = (
   note: NoteWithOctave | null | undefined
@@ -37,8 +34,12 @@ export const getNoteFrequency = (note: NoteWithOctave, a4Frequency: number) => {
   const semitonesFromA4 =
     noteIndex -
     a4Index +
-    (parseInt(octave) - BASE_OCTAVE) * SEMITONES_IN_OCTAVE;
-  return a4Frequency * Math.pow(2, semitonesFromA4 / SEMITONES_IN_OCTAVE);
+    (parseInt(octave) - TUNER_CONSTANTS.OCTAVE.BASE) *
+      TUNER_CONSTANTS.MIDI.SEMITONES_IN_OCTAVE;
+  return (
+    a4Frequency *
+    Math.pow(2, semitonesFromA4 / TUNER_CONSTANTS.MIDI.SEMITONES_IN_OCTAVE)
+  );
 };
 
 export const getNoteName = (
@@ -53,10 +54,13 @@ export const getNoteName = (
     return null;
 
   const semitonesFromA4 =
-    Math.log2(frequency / a4Frequency) * SEMITONES_IN_OCTAVE;
-  const midiNote = Math.round(semitonesFromA4 + MIDI_A4);
-  const noteIndex = midiNote % SEMITONES_IN_OCTAVE;
-  const octave = Math.floor(midiNote / SEMITONES_IN_OCTAVE) - 1;
+    Math.log2(frequency / a4Frequency) *
+    TUNER_CONSTANTS.MIDI.SEMITONES_IN_OCTAVE;
+  const midiNote = Math.round(semitonesFromA4 + TUNER_CONSTANTS.MIDI.A4);
+  const noteIndex = midiNote % TUNER_CONSTANTS.MIDI.SEMITONES_IN_OCTAVE;
+  const octave =
+    Math.floor(midiNote / TUNER_CONSTANTS.MIDI.SEMITONES_IN_OCTAVE) -
+    TUNER_CONSTANTS.OCTAVE.OFFSET;
   const noteName = NOTES[noteIndex];
 
   return `${noteName}${octave}` as NoteWithOctave;

@@ -45,3 +45,60 @@ export interface TunerConfig {
    */
   UPDATE_INTERVAL: number;
 }
+
+export interface TunerConstants {
+  MIDI: {
+    /**
+     * MIDI note number for A4
+     * @default 69
+     */
+    A4: number;
+    /**
+     * Number of semitones in an octave
+     * @default 12
+     */
+    SEMITONES_IN_OCTAVE: number;
+  };
+  OCTAVE: {
+    /**
+     * Base octave number
+     * @default 4 - corresponds to A4
+     */
+    BASE: number;
+    /**
+     * Offset for the octave
+     * @default 1 - used for calculations
+     * @example If BASE is 4, then the first octave is 3 (4 - 1)
+     */
+    OFFSET: number;
+  };
+  ACCURACY: {
+    /**
+     * Minimum accuracy value
+     * @default -0.5 - corresponds to a significant deviation
+     */
+    MIN: number;
+    /**
+     * Maximum accuracy value
+     * @default 0.5 - corresponds to a perfect pitch
+     */
+    MAX: number;
+    /**
+     * Low threshold for accuracy
+     * @default 0.1 - corresponds to a small deviation
+     */
+    THRESHOLD_LOW: number;
+    /**
+     * High threshold for accuracy
+     * @default 0.3 - corresponds to a moderate deviation
+     */
+    THRESHOLD_HIGH: number;
+  };
+  PITCH: {
+    /**
+     * Number of cents in a semitone
+     * @default 100 - standard tuning unit
+     */
+    CENTS_PER_SEMITONE: number;
+  };
+}

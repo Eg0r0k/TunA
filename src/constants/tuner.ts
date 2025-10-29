@@ -1,4 +1,4 @@
-import { TunerConfig } from "@/types/tuner/config";
+import { TunerConfig, TunerConstants } from "@/types/tuner/config";
 import { NoteName } from "@/types/tuner/notes";
 
 export const DEFAULT_LOCALE = "en";
@@ -30,3 +30,23 @@ export const TUNER_CONFIG = {
   TUNING_DELAY: 200,
   UPDATE_INTERVAL: 100,
 } as const satisfies TunerConfig;
+
+export const TUNER_CONSTANTS = {
+  MIDI: {
+    A4: 69,
+    SEMITONES_IN_OCTAVE: 12,
+  },
+  OCTAVE: {
+    BASE: 4,
+    OFFSET: 1,
+  },
+  ACCURACY: {
+    MIN: -0.5,
+    MAX: 0.5,
+    THRESHOLD_LOW: 0.1,
+    THRESHOLD_HIGH: 0.3,
+  },
+  PITCH: {
+    CENTS_PER_SEMITONE: 100,
+  },
+} as const satisfies TunerConstants;

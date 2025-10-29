@@ -25,7 +25,7 @@ self.onmessage = (e: MessageEvent<PitchWorkerInput>) => {
   }
 };
 
-//Clean up after closewebworker
+//Clean up after close webworker
 self.onclose = () => {
   detector = null;
 };

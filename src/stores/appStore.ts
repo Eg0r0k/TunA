@@ -1,15 +1,15 @@
 import { useDevicesList } from "@vueuse/core";
 import { defineStore } from "pinia";
-import { computed, shallowReactive } from "vue";
+import { computed, readonly, shallowReactive } from "vue";
 
-interface AppStateI {
+interface AppState {
   selectedDeviceId: string | null;
 }
 
 export const useAppStore = defineStore(
   "app",
   () => {
-    const state = shallowReactive<AppStateI>({
+    const state = shallowReactive<AppState>({
       selectedDeviceId: null,
     });
 
@@ -71,7 +71,7 @@ export const useAppStore = defineStore(
       audioDevices,
       selectedDevice,
       selectedDeviceId,
-      isSupported,
+      isSupported: readonly(isSupported),
       ensurePermissions,
       setDevice,
     };

@@ -1,7 +1,8 @@
 import { useFrequencyAnalyzer } from "@/composables/useFrequencyAnalyzer";
-import { TUNER_CONFIG } from "@/constants/tuner";
+import { TUNER_CONFIG, TUNER_CONSTANTS } from "@/constants/tuner";
 import { INSTRUMENTS } from "@/data/tunings";
 import { Instrument, Tuning } from "@/types/tuner/instruments";
+import { NoteWithOctave } from "@/types/tuner/notes";
 import { getNextNote, getPrevNote, splitNote } from "@/utils/noteUtils";
 import { defineStore } from "pinia";
 import { computed, ref } from "vue";
@@ -29,13 +30,10 @@ export const useTunerStore = defineStore("tuner", () => {
   const prevNote = computed(() => getPrevNote(noteParts.value.name));
   const nextNote = computed(() => getNextNote(noteParts.value.name));
 
-  const ACCURACY_THRESHOLD_LOW = 0.1;
-  const ACCURACY_THRESHOLD_MEDIUM = 0.3;
-
   const accuracyTextColor = computed(() => {
     const acc = Math.abs(tuningAccuracy.value);
-    if (acc < ACCURACY_THRESHOLD_LOW) return "text-primary";
-    if (acc < ACCURACY_THRESHOLD_MEDIUM) return "text-yellow-500";
+    if (acc < TUNER_CONSTANTS.ACCURACY.THRESHOLD_LOW) return "text-primary";
+    if (acc < TUNER_CONSTANTS.ACCURACY.THRESHOLD_HIGH) return "text-yellow-500";
     return "text-destructive";
   });
 
@@ -61,9 +59,8 @@ export const useTunerStore = defineStore("tuner", () => {
   const accuracyStatus = computed(() => {
     if (!frequency.value) return "default";
 
-    if (selectedString.value) {
-      if (suggestedNote.value !== selectedString.value) return "wrongString";
-      return getTuningStatus(tuningAccuracy.value);
+    if (selectedString.value && suggestedNote.value !== selectedString.value) {
+      return "wrongString";
     }
 
     return getTuningStatus(tuningAccuracy.value);
@@ -87,7 +84,11 @@ export const useTunerStore = defineStore("tuner", () => {
     isActive.value ? stop() : start();
   };
 
-  const handleInstrumentChange = (instrument: Instrument) => {
+  const toggleStringSelection = (note: NoteWithOctave) => {
+    setSelectedString(note === selectedString.value ? null : note);
+  };
+
+  const handleInstrumentChange = (instrument: Instrument): void => {
     currentInstrument.value = instrument;
     handleTuningChange(instrument.tunings[0]);
   };
@@ -117,6 +118,7 @@ export const useTunerStore = defineStore("tuner", () => {
     gaugeRotation,
     memoizedTuningState,
 
+    toggleStringSelection,
     start,
     stop,
     handleInstrumentChange,
