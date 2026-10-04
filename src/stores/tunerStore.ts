@@ -6,6 +6,7 @@ import {
   addCustomTuning,
   deleteTuning,
   getTunings,
+  updateTuning,
 } from "@/db/tuningService";
 import { i18n } from "@/i18n";
 import { Instrument, Tuning } from "@/types/tuner/instruments";
@@ -310,9 +311,26 @@ export const useTunerStore = defineStore(
       handleTuningChange(`${CUSTOM_TUNING_PREFIX}${id}`);
     };
 
+    const toDbId = (tuningId: string) =>
+      Number(tuningId.slice(CUSTOM_TUNING_PREFIX.length));
+
+    const updateCustomTuning = async (
+      tuningId: string,
+      name: string,
+      notes: NoteWithOctave[]
+    ) => {
+      if (!tuningId.startsWith(CUSTOM_TUNING_PREFIX)) return;
+      await updateTuning(toDbId(tuningId), { name, notes });
+      await loadCustomTunings();
+      if (currentTuning.value.id === tuningId) {
+        selectedString.value = null;
+        resetTuning();
+      }
+    };
+
     const deleteCustomTuning = async (tuningId: string) => {
       if (!tuningId.startsWith(CUSTOM_TUNING_PREFIX)) return;
-      await deleteTuning(Number(tuningId.slice(CUSTOM_TUNING_PREFIX.length)));
+      await deleteTuning(toDbId(tuningId));
       if (currentTuning.value.id === tuningId) {
         handleTuningChange(currentInstrument.value.tunings[0].id);
       }
@@ -393,6 +411,7 @@ export const useTunerStore = defineStore(
       toggleTuner,
       resetTuning,
       createCustomTuning,
+      updateCustomTuning,
       deleteCustomTuning,
       playReference,
     };
