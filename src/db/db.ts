@@ -1,4 +1,3 @@
-import { type Instrument } from "@/types/tuner/instruments";
 import { type NoteWithOctave } from "@/types/tuner/notes";
 import Dexie, { EntityTable } from "dexie";
 
@@ -16,11 +15,17 @@ export interface TuningScheme {
 }
 
 export const db = new Dexie("tuningsDB") as Dexie & {
-  instruments: EntityTable<Instrument, "id">;
+  instruments: EntityTable<InstrumentScheme, "id">;
   tunings: EntityTable<TuningScheme, "id">;
 };
 
 db.version(2).stores({
   instruments: "id, name",
   tunings: "++id, instrument_id, name, notes, custom",
+});
+
+// Only fields used in queries need an index
+db.version(3).stores({
+  instruments: "id",
+  tunings: "++id, instrument_id",
 });

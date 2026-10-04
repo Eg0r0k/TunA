@@ -16,32 +16,15 @@ import WindowTitle from './WindowTitle.vue'
 import MainHeader from '@/components/header/MainHeader.vue';
 import { useColorMode } from '@vueuse/core';
 import { Toaster } from './components/ui/sonner';
-import { registerSW } from "virtual:pwa-register";
-import { toast } from "vue-sonner";
-import { useI18n } from 'vue-i18n';
-
-const { t } = useI18n();
+import { onMounted } from 'vue';
+import { useUpdateStore } from '@/stores/updateStore';
 
 // The theme hook must be called from root
 useColorMode();
 
-// SW controller
-const updateSW = registerSW({
-  onNeedRefresh() {
-    toast.info(t('tuner.readyToRefresh'), {
-      duration: 999999,
-      action: {
-        label: t('general.refresh'),
-        onClick: () => {
-          updateSW(true);
-        },
-      },
-    });
-  },
-  onOfflineReady() {
-    toast.success(t('tuner.readyToOffline'));
-  },
-});
+// Service worker (web) or tauri-plugin-updater (desktop)
+const updateStore = useUpdateStore();
+onMounted(() => updateStore.init());
 </script>
 
 
