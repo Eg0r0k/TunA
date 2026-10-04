@@ -43,7 +43,7 @@
   },
   "plugins": {
     "updater": {
-      "pubkey": "REPLACE_WITH_UPDATER_PUBLIC_KEY",
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDEyMEQ1NzY3RTlDNDA0NzAKUldSd0JNVHBaMWNORW9pYm1hTFNPS3dETnpibGl3OHBMMHlYNEV2RkZrYnh0VEFpUkl3QlA2QksK",
       "endpoints": [
         "https://github.com/Eg0r0k/TunA/releases/latest/download/latest.json"
       ],
