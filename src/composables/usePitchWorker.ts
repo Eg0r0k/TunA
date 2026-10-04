@@ -1,4 +1,4 @@
-import { PitchWorkerMessage } from "@/types/worker";
+import { PitchWorkerInput, PitchWorkerMessage } from "@/types/worker";
 import { shallowRef } from "vue";
 
 export const usePitchWorker = () => {
@@ -23,12 +23,15 @@ export const usePitchWorker = () => {
     };
   };
 
-  const terminateWorker = (): void => {
-    if (worker.value && worker.value instanceof Worker) {
-      worker.value.terminate();
-      worker.value = null;
-    }
+  /** Sends the buffer to the worker, transferring (not copying) its memory */
+  const postBuffer = (input: PitchWorkerInput): void => {
+    worker.value?.postMessage(input, [input.buffer.buffer]);
   };
 
-  return { worker, initWorker, terminateWorker };
+  const terminateWorker = (): void => {
+    worker.value?.terminate();
+    worker.value = null;
+  };
+
+  return { worker, initWorker, postBuffer, terminateWorker };
 };

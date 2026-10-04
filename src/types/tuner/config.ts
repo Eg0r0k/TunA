@@ -1,49 +1,77 @@
 export interface TunerConfig {
   /**
-   * FFT window size (must be a power of two)
+   * Analysis window size (must be a power of two)
    */
   FFT_SIZE: number;
   /**
    * Minimum recognizable frequency (Hz)
-   * @default 20Hz - the lower limit of human hearing
+   * @default 25Hz - slightly below the lowest string of a 5-string bass (B0 ≈ 30.9Hz)
    */
   MIN_FREQUENCY: number;
   /**
    * Maximum recognizable frequency (Hz)
-   *@default 20000Hz - the upper limit of human hearing
+   * @default 4200Hz - the top of a piano keyboard (C8 ≈ 4186Hz)
    */
   MAX_FREQUENCY: number;
   /**
    * Minimum threshold for signal clarity
    * @range 0-1
-   * @default 0.8 - 80% confidence in tone determination
+   * @default 0.9 - 90% confidence in tone determination
    */
   MIN_CLARITY: number;
   /**
-   * Permissible deviation for tuning (in fractions of a semitone)
-   * @example 0.1 - a deviation of ±10% of a halftone is allowed
+   * Noise gate: signals quieter than this RMS level are treated as silence
+   * @range 0-1
    */
-  TUNING_THRESHOLD: number;
+  MIN_RMS: number;
   /**
-   * Frequency smoothing time (seconds)
-   * @default 0.2 - 200 ms to stabilize readings
+   * Analyser smoothing time constant
    */
   SMOOTHING_TIME: number;
   /**
-   * Maximum indicator rotation angle (degrees)
-   * @default 90° - from -45° to +45°
+   * Indicator rotation angle (degrees) at the edge of the scale (±MAX_DISPLAY_CENTS)
    */
   GAUGE_MAX_ROTATION: number;
   /**
-   * Delay analysis starts (ms)
-   * @default 200
+   * Deviation shown at the edge of the gauge (cents)
+   */
+  MAX_DISPLAY_CENTS: number;
+  /**
+   * How long a string must stay in (or out of) tune before its state flips (ms)
    */
   TUNING_DELAY: number;
   /**
    * Data update interval (ms)
-   * @default 100 - optimal balance between accuracy and responsiveness
    */
   UPDATE_INTERVAL: number;
+  /**
+   * How long the last detected pitch is held after the signal disappears (ms)
+   */
+  SILENCE_HOLD: number;
+  /**
+   * Number of readings used by the median filter
+   */
+  SMOOTHING_WINDOW: number;
+  /**
+   * A jump larger than this (cents) is treated as a new note instead of noise
+   */
+  NOTE_CHANGE_CENTS: number;
+  /**
+   * Consecutive readings required to confirm a new note
+   */
+  NOTE_CHANGE_CONFIRM: number;
+  /**
+   * Deviation (cents) up to which the status is shown as a warning instead of an error
+   */
+  WARNING_CENTS: number;
+  /**
+   * Default "in tune" tolerance (cents), user adjustable in settings
+   */
+  DEFAULT_TOLERANCE_CENTS: number;
+  /**
+   * Duration of the reference tone (ms)
+   */
+  REFERENCE_TONE_DURATION: number;
 }
 
 export interface TunerConstants {
@@ -66,33 +94,10 @@ export interface TunerConstants {
      */
     BASE: number;
     /**
-     * Offset for the octave
-     * @default 1 - used for calculations
-     * @example If BASE is 4, then the first octave is 3 (4 - 1)
+     * Offset between MIDI octaves and scientific pitch notation
+     * @default 1 - MIDI note 0 is C-1
      */
     OFFSET: number;
-  };
-  ACCURACY: {
-    /**
-     * Minimum accuracy value
-     * @default -0.5 - corresponds to a significant deviation
-     */
-    MIN: number;
-    /**
-     * Maximum accuracy value
-     * @default 0.5 - corresponds to a perfect pitch
-     */
-    MAX: number;
-    /**
-     * Low threshold for accuracy
-     * @default 0.1 - corresponds to a small deviation
-     */
-    THRESHOLD_LOW: number;
-    /**
-     * High threshold for accuracy
-     * @default 0.3 - corresponds to a moderate deviation
-     */
-    THRESHOLD_HIGH: number;
   };
   PITCH: {
     /**

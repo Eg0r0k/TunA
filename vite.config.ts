@@ -1,37 +1,82 @@
-import { defineConfig } from "vite";
+/// <reference types="vitest/config" />
+import { defineConfig, type Plugin } from "vite";
 import vue from "@vitejs/plugin-vue";
 import path from "node:path";
 import { VitePWA } from "vite-plugin-pwa";
 import pkg from "./package.json";
 import tailwindcss from "@tailwindcss/vite";
+
 const host = process.env.TAURI_DEV_HOST;
+// Set by the Tauri CLI while it runs `beforeBuildCommand` / `beforeDevCommand`
+const isTauriBuild = !!process.env.TAURI_ENV_PLATFORM;
+const appName = process.env.VITE_PWA_NAME || "TunA";
+
+/**
+ * Emits `version.json`, which the web app fetches (bypassing the service
+ * worker cache) to show which version an update brings.
+ */
+const versionManifest = (): Plugin => ({
+  name: "tuna:version-manifest",
+  apply: "build",
+  generateBundle() {
+    this.emitFile({
+      type: "asset",
+      fileName: "version.json",
+      source: JSON.stringify({
+        version: pkg.version,
+        buildTime: new Date().toISOString(),
+      }),
+    });
+  },
+});
+
+const getBase = () => {
+  if (isTauriBuild) return "/";
+  return process.env.NODE_ENV === "production" ? "/TunA/" : "/";
+};
 
 // https://vitejs.dev/config/
 export default defineConfig(async () => ({
-  base: process.env.NODE_ENV === "production" ? "/TunA/" : "/",
+  base: getBase(),
 
   plugins: [
     vue(),
     tailwindcss(),
+    versionManifest(),
     VitePWA({
-      registerType: "autoUpdate",
-      includeAssets: ["favicon.ico", "robots.txt", "icons/*.png"],
-      // devOptions: {
-      //   enabled: false,
-      // },
-      injectRegister: "auto",
+      // The desktop app is updated by tauri-plugin-updater instead
+      disable: isTauriBuild,
+      // The user decides when to reload (see src/stores/updateStore.ts)
+      registerType: "prompt",
+      injectRegister: false,
+      includeAssets: ["robots.txt", "icons/*.png"],
       manifest: {
-        name: process.env.VITE_PWA_NAME,
-        short_name: process.env.VITE_PWA_NAME,
+        id: "/TunA/",
+        name: appName,
+        short_name: appName,
+        description:
+          "A precise and user-friendly app for tuning your musical instruments.",
+        start_url: ".",
+        scope: ".",
         theme_color: "#090909",
         background_color: "#090909",
-
         display: "standalone",
+        icons: [
+          { src: "icons/icon-192.png", sizes: "192x192", type: "image/png" },
+          { src: "icons/icon-512.png", sizes: "512x512", type: "image/png" },
+          {
+            src: "icons/icon-512.png",
+            sizes: "512x512",
+            type: "image/png",
+            purpose: "maskable",
+          },
+        ],
       },
       workbox: {
         cleanupOutdatedCaches: true,
-        clientsClaim: true,
-        skipWaiting: true,
+        globPatterns: ["**/*.{js,css,html,png,svg,webp,ico}"],
+        // version.json must always come from the network
+        globIgnores: ["**/version.json", "**/screenshots/**"],
       },
     }),
   ],
@@ -40,18 +85,20 @@ export default defineConfig(async () => ({
   },
   build: {
     sourcemap: false,
-    terserOptions: {
-      compress: {
-        drop_console: false,
-        drop_debugger: false,
-      },
-    },
     chunkSizeWarningLimit: 1600,
+  },
+  esbuild: {
+    // Keep errors and warnings in production, drop debug noise
+    pure: ["console.log", "console.debug"],
   },
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
     },
+  },
+  test: {
+    environment: "node",
+    include: ["src/**/*.test.ts"],
   },
   clearScreen: false,
   server: {

@@ -1,6 +1,9 @@
 import { NOTES, TUNER_CONFIG, TUNER_CONSTANTS } from "@/constants/tuner";
 import { NoteName, NoteWithOctave } from "@/types/tuner/notes";
 
+const { A4: A4_MIDI, SEMITONES_IN_OCTAVE } = TUNER_CONSTANTS.MIDI;
+const { CENTS_PER_SEMITONE } = TUNER_CONSTANTS.PITCH;
+
 interface SplitedNote {
   name: NoteName | "—";
   octave: string;
@@ -23,61 +26,83 @@ export const splitNote = (
   };
 };
 
-export const getNoteFrequency = (note: NoteWithOctave, a4Frequency: number) => {
-  const { name: noteName, octave } = splitNote(note);
-  if (noteName === "—") {
-    return 0;
-  }
-
-  const noteIndex = NOTES.indexOf(noteName);
-  const a4Index = NOTES.indexOf("A");
-  const semitonesFromA4 =
-    noteIndex -
-    a4Index +
-    (parseInt(octave) - TUNER_CONSTANTS.OCTAVE.BASE) *
-      TUNER_CONSTANTS.MIDI.SEMITONES_IN_OCTAVE;
+/** MIDI number of a note (A4 = 69), or null for an unparsable note */
+export const noteToMidi = (note: NoteWithOctave): number | null => {
+  const { name, octave } = splitNote(note);
+  if (name === "—") return null;
   return (
-    a4Frequency *
-    Math.pow(2, semitonesFromA4 / TUNER_CONSTANTS.MIDI.SEMITONES_IN_OCTAVE)
+    (parseInt(octave) + TUNER_CONSTANTS.OCTAVE.OFFSET) * SEMITONES_IN_OCTAVE +
+    NOTES.indexOf(name)
   );
 };
+
+export const midiToNote = (midi: number): NoteWithOctave => {
+  const noteIndex =
+    ((midi % SEMITONES_IN_OCTAVE) + SEMITONES_IN_OCTAVE) % SEMITONES_IN_OCTAVE;
+  const octave =
+    Math.floor(midi / SEMITONES_IN_OCTAVE) - TUNER_CONSTANTS.OCTAVE.OFFSET;
+  return `${NOTES[noteIndex]}${octave}` as NoteWithOctave;
+};
+
+export const midiToFrequency = (midi: number, a4Frequency: number): number =>
+  a4Frequency * Math.pow(2, (midi - A4_MIDI) / SEMITONES_IN_OCTAVE);
+
+/** Fractional MIDI number of a frequency */
+export const frequencyToMidi = (frequency: number, a4Frequency: number) =>
+  Math.log2(frequency / a4Frequency) * SEMITONES_IN_OCTAVE + A4_MIDI;
+
+export const getNoteFrequency = (note: NoteWithOctave, a4Frequency: number) => {
+  const midi = noteToMidi(note);
+  return midi === null ? 0 : midiToFrequency(midi, a4Frequency);
+};
+
+const isInRange = (frequency: number) =>
+  frequency >= TUNER_CONFIG.MIN_FREQUENCY &&
+  frequency <= TUNER_CONFIG.MAX_FREQUENCY;
 
 export const getNoteName = (
   frequency: number,
   a4Frequency: number
 ): NoteWithOctave | null => {
-  if (
-    !frequency ||
-    frequency < TUNER_CONFIG.MIN_FREQUENCY ||
-    frequency > TUNER_CONFIG.MAX_FREQUENCY
-  )
-    return null;
-
-  const semitonesFromA4 =
-    Math.log2(frequency / a4Frequency) *
-    TUNER_CONSTANTS.MIDI.SEMITONES_IN_OCTAVE;
-  const midiNote = Math.round(semitonesFromA4 + TUNER_CONSTANTS.MIDI.A4);
-  const noteIndex = midiNote % TUNER_CONSTANTS.MIDI.SEMITONES_IN_OCTAVE;
-  const octave =
-    Math.floor(midiNote / TUNER_CONSTANTS.MIDI.SEMITONES_IN_OCTAVE) -
-    TUNER_CONSTANTS.OCTAVE.OFFSET;
-  const noteName = NOTES[noteIndex];
-
-  return `${noteName}${octave}` as NoteWithOctave;
+  if (!frequency || !isInRange(frequency)) return null;
+  return midiToNote(Math.round(frequencyToMidi(frequency, a4Frequency)));
 };
 
-const findNoteIndex = (noteName: string): number => {
-  return NOTES.indexOf(noteName as NoteName);
+/** Deviation of `frequency` from `targetFrequency` in cents */
+export const getCents = (frequency: number, targetFrequency: number) => {
+  if (frequency <= 0 || targetFrequency <= 0) return 0;
+  return SEMITONES_IN_OCTAVE * CENTS_PER_SEMITONE * Math.log2(frequency / targetFrequency);
 };
 
-export const getPrevNote = (note: string): NoteName | "—" => {
-  const index = findNoteIndex(note);
-  if (index === -1) return "—";
-  return NOTES[(index - 1 + NOTES.length) % NOTES.length];
+/**
+ * The note from `notes` closest to `frequency` (by absolute cents distance).
+ * Used for automatic string detection.
+ */
+export const findClosestNote = (
+  frequency: number,
+  notes: readonly NoteWithOctave[],
+  a4Frequency: number
+): NoteWithOctave | null => {
+  if (!frequency || notes.length === 0) return null;
+  let closest: NoteWithOctave | null = null;
+  let minDistance = Infinity;
+  for (const note of notes) {
+    const distance = Math.abs(
+      getCents(frequency, getNoteFrequency(note, a4Frequency))
+    );
+    if (distance < minDistance) {
+      minDistance = distance;
+      closest = note;
+    }
+  }
+  return closest;
 };
 
-export const getNextNote = (note: string): NoteName | "—" => {
-  const index = findNoteIndex(note);
-  if (index === -1) return "—";
-  return NOTES[(index + 1) % NOTES.length];
+/** Neighbouring semitones of a note, with correct octaves (B3 → C4) */
+export const getAdjacentNotes = (
+  note: NoteWithOctave | null
+): { prev: NoteWithOctave | null; next: NoteWithOctave | null } => {
+  const midi = note ? noteToMidi(note) : null;
+  if (midi === null) return { prev: null, next: null };
+  return { prev: midiToNote(midi - 1), next: midiToNote(midi + 1) };
 };
